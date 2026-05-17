@@ -1,8 +1,10 @@
 #!/usr/bin/env bun
 import { applyCliSettingsCommand, helpText } from "./commands";
 import { composeCliAgent } from "./compose";
+import { renderSessionHistory } from "./history";
 import { createCliReadline } from "./readline";
-import { renderEvent } from "./render";
+import { CliTurnRenderer } from "./render";
+import { selectInitialSession } from "./sessionSelection";
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
@@ -11,16 +13,23 @@ async function main(): Promise<void> {
     return;
   }
 
-  const cwd = process.env.AGENT_SEED_CWD ?? process.cwd();
+  const cwd = process.env.SEED_CWD ?? process.cwd();
   const { config, sessions, agent } = await composeCliAgent(cwd, {
     headlessAuth: args.includes("--headless-auth"),
   });
+  const rl = createCliReadline();
   let session = args.includes("--resume")
     ? await sessions.continueRecentOrCreate(config)
-    : await sessions.createSession(config);
-
-  const rl = createCliReadline();
+    : await selectInitialSession({
+        sessions,
+        config,
+        io: {
+          question: (prompt) => rl.question(prompt),
+          write: (text) => process.stdout.write(text),
+        },
+      });
   process.stdout.write(`Session ${session.id}\n`);
+  process.stdout.write(await renderSessionHistory(sessions, session.id));
   try {
     while (true) {
       const input = (await rl.question("> ")).trim();
@@ -38,6 +47,7 @@ async function main(): Promise<void> {
       if (input === "/resume") {
         session = await sessions.continueRecentOrCreate(config);
         process.stdout.write(`Session ${session.id}\n`);
+        process.stdout.write(await renderSessionHistory(sessions, session.id));
         continue;
       }
       if (
@@ -54,13 +64,14 @@ async function main(): Promise<void> {
         continue;
       }
 
+      const renderer = new CliTurnRenderer();
       for await (const event of agent.runTurn({
         sessionId: session.id,
         input,
       })) {
-        const rendered = renderEvent(event);
+        const rendered = renderer.render(event);
         if (rendered.length > 0) {
-          process.stdout.write(`${rendered}\n`);
+          process.stdout.write(rendered);
         }
       }
     }

@@ -38,11 +38,19 @@ export class CodexResponsesTransport implements ResponsesTransport {
       body: JSON.stringify(buildCodexResponsesBody(request)),
     });
 
-    if (!response.ok || !response.body) {
+    if (!response.ok) {
+      const detail = await response.text().catch(() => "");
       throw new AgentError({
         code: "transport_failed",
-        message: `Codex Responses request failed with status ${response.status}.`,
+        message: `Codex Responses request failed with status ${response.status}.${detail ? ` ${detail}` : ""}`,
         retryable: response.status >= 500,
+      });
+    }
+
+    if (!response.body) {
+      throw new AgentError({
+        code: "transport_failed",
+        message: "Codex Responses request did not include a stream body.",
       });
     }
 

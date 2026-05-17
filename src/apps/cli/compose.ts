@@ -27,7 +27,12 @@ export async function composeCliAgent(
   await ensureCliAuth({
     tokenStore,
     oauthFlow: new CodexOAuthFlow(),
-    exchangeAuthorizationCode: (input) => auth.exchangeAuthorizationCode(input),
+    exchangeAuthorizationCode: (input) =>
+      auth.exchangeAuthorizationCode({
+        code: input.authorizationCode,
+        redirectUri: input.redirectUri,
+        codeVerifier: input.codeVerifier,
+      }),
     headless: options.headlessAuth ?? false,
     output: (line) => process.stdout.write(`${line}\n`),
   });

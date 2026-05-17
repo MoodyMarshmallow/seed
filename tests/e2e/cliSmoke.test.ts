@@ -12,7 +12,7 @@ test("CLI smoke test can print help from the outside", async () => {
   }>((resolve) => {
     const child = spawn("bun", ["run", "src/apps/cli/main.ts", "--help"], {
       cwd: process.cwd(),
-      env: { ...process.env, AGENT_SEED_CWD: cwd },
+      env: { ...process.env, SEED_CWD: cwd },
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stdout = "";
@@ -27,6 +27,6 @@ test("CLI smoke test can print help from the outside", async () => {
   });
 
   expect(result).toMatchObject({ code: 0, stderr: "" });
-  expect(result.stdout).toContain("agent-seed");
+  expect(result.stdout).toContain("seed");
   expect(result.stdout).toContain("/model");
 });

@@ -1,10 +1,10 @@
 {
-  "name": "agent-seed",
+  "name": "seed",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
-    "agent-seed": "./src/apps/cli/main.ts"
+    "seed": "./src/apps/cli/main.ts"
   },
   "scripts": {
     "agent": "bun run src/apps/cli/main.ts",

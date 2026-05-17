@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "agent-seed",
+      "name": "seed",
       "dependencies": {
         "zod": "^4.0.1",
       },

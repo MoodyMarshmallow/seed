@@ -18,6 +18,10 @@ export interface RunTurnInput {
   readonly input: string;
 }
 
+interface AssistantPassResult {
+  readonly toolCalls: ToolCallRequest[];
+}
+
 /** Core agent orchestrator. It depends only on ports and session APIs. */
 export class Agent {
   readonly #sessions: SessionManager;
@@ -36,8 +40,8 @@ export class Agent {
       content: [{ type: "text", text: input.input }],
     });
 
-    const firstPass = await this.#collectAssistantPass(input.sessionId);
-    yield* firstPass.events;
+    const firstPass: AssistantPassResult = { toolCalls: [] };
+    yield* this.#streamAssistantPass(input.sessionId, firstPass);
 
     if (firstPass.toolCalls.length === 0) {
       yield { type: "completed" };
@@ -54,20 +58,17 @@ export class Agent {
       yield { type: "tool_result", ...result };
     }
 
-    const secondPass = await this.#collectAssistantPass(input.sessionId);
-    yield* secondPass.events;
+    yield* this.#streamAssistantPass(input.sessionId, { toolCalls: [] });
     yield { type: "completed" };
   }
 
-  async #collectAssistantPass(sessionId: string): Promise<{
-    readonly events: readonly AgentTurnEvent[];
-    readonly toolCalls: readonly ToolCallRequest[];
-  }> {
+  async *#streamAssistantPass(
+    sessionId: string,
+    result: AssistantPassResult,
+  ): AsyncGenerator<AgentTurnEvent> {
     const context = await this.#sessions.buildContext(sessionId);
     const tools = await this.#tools.list();
-    const events: AgentTurnEvent[] = [];
     const content: MessageContentBlock[] = [];
-    const toolCalls: ToolCallRequest[] = [];
 
     for await (const event of this.#transport.stream({
       systemPrompt: context.systemPrompt,
@@ -78,11 +79,11 @@ export class Agent {
       switch (event.type) {
         case "reasoning_summary.delta":
           content.push({ type: "reasoning_summary", text: event.delta });
-          events.push({ type: event.type, delta: event.delta });
+          yield { type: event.type, delta: event.delta };
           break;
         case "text.delta":
           content.push({ type: "text", text: event.delta });
-          events.push({ type: event.type, delta: event.delta });
+          yield { type: event.type, delta: event.delta };
           break;
         case "tool_call": {
           const toolCall = {
@@ -90,9 +91,9 @@ export class Agent {
             name: event.name,
             input: event.input,
           };
-          toolCalls.push(toolCall);
+          result.toolCalls.push(toolCall);
           content.push({ type: "tool_call", raw: toolCall });
-          events.push({ type: "tool_call", ...toolCall });
+          yield { type: "tool_call", ...toolCall };
           break;
         }
         case "failed":
@@ -107,8 +108,6 @@ export class Agent {
       role: "assistant",
       content,
     });
-
-    return { events, toolCalls };
   }
 
   #toResponsesMessages(

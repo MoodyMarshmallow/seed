@@ -96,3 +96,47 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
     { type: "tool_call", raw: { callId: "call_1", name: "bash", input: {} } },
   ]);
 });
+
+test("agent turn yields streaming text before the transport finishes", async () => {
+  const cwd = await mkdtemp(join(tmpdir(), "agent-streaming-"));
+  const sessions = new SessionManager({
+    cwd,
+    store: new JsonlSessionStore({ rootDir: join(cwd, ".agent", "sessions") }),
+  });
+  const session = await sessions.createSession({
+    systemPrompt: "Be direct.",
+    model: "gpt-5.5",
+    reasoning: { effort: "medium", summary: "auto" },
+    responseOverrides: {},
+  });
+  let releaseTransport: () => void = () => undefined;
+  const transportGate = new Promise<void>((resolve) => {
+    releaseTransport = resolve;
+  });
+  const transport = {
+    async *stream(): AsyncGenerator<ResponsesStreamEvent> {
+      yield { type: "text.delta", delta: "streamed", raw: {} };
+      await transportGate;
+      yield { type: "completed", raw: {} };
+    },
+  };
+  const agent = new Agent({
+    sessions,
+    transport,
+    tools: new EmptyToolRegistry(),
+  });
+
+  const iterator = agent.runTurn({ sessionId: session.id, input: "Say hi." });
+  const first = await iterator.next();
+
+  expect(first).toEqual({
+    done: false,
+    value: { type: "text.delta", delta: "streamed" },
+  });
+
+  releaseTransport();
+  await expect(iterator.next()).resolves.toEqual({
+    done: false,
+    value: { type: "completed" },
+  });
+});

@@ -1,6 +1,6 @@
-# agentSeed Context
+# seed Context
 
-`agentSeed` is a single-package Bun/TypeScript coding-agent template.
+`seed` is a single-package Bun/TypeScript coding-agent template.
 
 ## Domain Terms
 

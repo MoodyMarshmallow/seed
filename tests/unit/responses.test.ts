@@ -74,6 +74,13 @@ test("Codex responses transport streams text, reasoning summaries, tool calls, a
     instructions: "Be useful.",
     reasoning: { effort: "medium", summary: "auto" },
     parallel_tool_calls: false,
+    store: false,
+    input: [
+      {
+        role: "user",
+        content: [{ type: "input_text", text: "Hi" }],
+      },
+    ],
   });
   expect(events).toEqual([
     {
@@ -91,4 +98,26 @@ test("Codex responses transport streams text, reasoning summaries, tool calls, a
     },
     { type: "completed", raw: expect.any(Object) },
   ]);
+});
+
+test("Codex responses transport includes response error details when the backend rejects a request", async () => {
+  const transport = new CodexResponsesTransport({
+    getAccessToken: async () => "access-token",
+    fetch: async () => new Response("bad request detail", { status: 400 }),
+  });
+
+  await expect(async () => {
+    for await (const _event of transport.stream({
+      systemPrompt: "Be useful.",
+      settings: {
+        model: "gpt-5.5",
+        reasoning: { effort: "medium", summary: "auto" },
+        responseOverrides: {},
+      },
+      messages: [{ role: "user", content: "Hi" }],
+      tools: [],
+    })) {
+      // consume stream
+    }
+  }).rejects.toThrow("bad request detail");
 });

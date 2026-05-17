@@ -96,7 +96,7 @@ test("Codex auth client exchanges OAuth authorization codes into local tokens", 
 
 test("CLI auth starts OAuth when no local token exists", async () => {
   let openedUrl: string | null = null;
-  let exchangedCode: string | null = null;
+  let exchangedAuthorizationCode: string | null = null;
   const output: string[] = [];
 
   await ensureCliAuth({
@@ -120,12 +120,12 @@ test("CLI auth starts OAuth when no local token exists", async () => {
     openUrl: async (url) => {
       openedUrl = url;
     },
-    exchangeAuthorizationCode: async ({ code }) => {
-      exchangedCode = code;
+    exchangeAuthorizationCode: async ({ authorizationCode }) => {
+      exchangedAuthorizationCode = authorizationCode;
     },
   });
 
   expect(openedUrl).toBe("https://auth.example/login");
-  expect(exchangedCode).toBe("oauth-code");
+  expect(exchangedAuthorizationCode).toBe("oauth-code");
   expect(output.join("\n")).toContain("No local Codex login found");
 });

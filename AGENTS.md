@@ -1,4 +1,4 @@
-# agentSeed
+# seed
 
 ## Agent skills
 

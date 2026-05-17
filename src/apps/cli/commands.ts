@@ -5,7 +5,7 @@ import type { ResponseSettings } from "../../core/sessions/entries";
 const jsonObjectSchema = z.record(z.string(), z.unknown());
 
 export function helpText(): string {
-  return `agent-seed
+  return `seed
 
 Usage:
   bun run agent [--new] [--resume] [--headless-auth]

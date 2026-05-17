@@ -7,6 +7,7 @@ export function buildCodexResponsesBody(
     ...request.settings.responseOverrides,
     model: request.settings.model,
     instructions: request.systemPrompt,
+    store: false,
     reasoning: request.settings.reasoning,
     input: request.messages.map((message) => {
       if (message.role === "tool_result") {
@@ -18,7 +19,12 @@ export function buildCodexResponsesBody(
       }
       return {
         role: message.role,
-        content: message.content,
+        content: [
+          {
+            type: message.role === "assistant" ? "output_text" : "input_text",
+            text: message.content,
+          },
+        ],
       };
     }),
     tools: request.tools.map((tool) => ({

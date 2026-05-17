@@ -11,7 +11,7 @@ interface EnsureCliAuthOptions {
   readonly tokenStore: TokenStore;
   readonly oauthFlow: OAuthFlowPort;
   readonly exchangeAuthorizationCode: (input: {
-    readonly code: string;
+    readonly authorizationCode: string;
     readonly redirectUri: string;
     readonly codeVerifier: string;
   }) => Promise<unknown>;
@@ -37,9 +37,9 @@ export async function ensureCliAuth(
     await (options.openUrl ?? openBrowser)(login.authUrl);
   }
 
-  const code = await login.waitForCode();
+  const authorizationCode = await login.waitForCode();
   await options.exchangeAuthorizationCode({
-    code,
+    authorizationCode,
     redirectUri: login.redirectUri,
     codeVerifier: login.codeVerifier,
   });

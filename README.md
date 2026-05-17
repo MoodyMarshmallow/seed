@@ -1,6 +1,6 @@
-# agentSeed
+# Seed
 
-`agentSeed` is a minimal Bun/TypeScript coding-agent template built around Codex subscription authentication and the ChatGPT Codex Responses endpoint.
+`Seed` is a minimal Bun/TypeScript agent template built around Codex subscription authentication and the ChatGPT Codex Responses endpoint.
 
 The library is the stable surface. The CLI is intentionally a thin development harness for end-to-end testing and local experimentation.
 
@@ -27,7 +27,7 @@ New sessions snapshot `agent.config.json` into the session trunk:
 ```json
 {
   "systemPrompt": "You are a minimal coding agent.",
-  "model": "gpt-5.1",
+  "model": "gpt-5.5",
   "reasoning": {
     "effort": "medium",
     "summary": "auto"
