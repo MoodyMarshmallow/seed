@@ -2,10 +2,10 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { JsonlSessionStore } from "../../src/adapters/file-system/JsonlSessionStore";
-import { SessionManager } from "../../src/core/sessions/SessionManager";
+import { JsonlSessionStore } from "../../../src/adapters/file-system/JsonlSessionStore";
+import { SessionManager } from "../../../src/core/sessions/SessionManager";
 
-test("new sessions snapshot system prompt and settings into a shared trunk", async () => {
+test("new conversations snapshot system prompt and settings into initial context", async () => {
   const cwd = await mkdtemp(join(tmpdir(), "agent-session-"));
   const sessions = new SessionManager({
     cwd,

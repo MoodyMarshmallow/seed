@@ -2,9 +2,9 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { JsonlSessionStore } from "../../src/adapters/file-system/JsonlSessionStore";
-import { TreeSessionMemory } from "../../src/adapters/memory/tree/TreeSessionMemory";
-import { SessionManager } from "../../src/core/sessions/SessionManager";
+import { JsonlSessionStore } from "../../../../src/adapters/file-system/JsonlSessionStore";
+import { TreeSessionMemory } from "../../../../src/adapters/memory/tree/TreeSessionMemory";
+import { SessionManager } from "../../../../src/core/sessions/SessionManager";
 
 test("tree session memory records conversation events and prepares model input", async () => {
   const cwd = await mkdtemp(join(tmpdir(), "tree-memory-"));

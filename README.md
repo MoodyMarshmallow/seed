@@ -121,6 +121,13 @@ The test suite uses Vitest and covers:
 - Library-level agent turns with missing tool-call recovery.
 - CLI command parsing and one process-level smoke test.
 
+Tests are grouped by ownership:
+
+- `tests/core/` for core Agent and conversation modules.
+- `tests/adapters/` for concrete Codex, filesystem, Memory, and tool adapters.
+- `tests/apps/cli/` for the CLI harness.
+- `tests/config/` for config loading and validation.
+
 Run all checks before using the template as a base:
 
 ```bash

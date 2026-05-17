@@ -1,4 +1,4 @@
-import { CliTurnRenderer } from "../../src/apps/cli/render";
+import { CliTurnRenderer } from "../../../src/apps/cli/render";
 
 test("CLI renderer streams text deltas inline instead of line-per-token", () => {
   const renderer = new CliTurnRenderer();

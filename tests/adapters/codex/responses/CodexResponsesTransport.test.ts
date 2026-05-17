@@ -1,4 +1,4 @@
-import { CodexResponsesTransport } from "../../src/adapters/codex/responses/CodexResponsesTransport";
+import { CodexResponsesTransport } from "../../../../src/adapters/codex/responses/CodexResponsesTransport";
 
 function sseStream(events: readonly unknown[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();

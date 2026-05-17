@@ -2,15 +2,15 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { JsonlSessionStore } from "../../src/adapters/file-system/JsonlSessionStore";
-import { TreeSessionMemory } from "../../src/adapters/memory/tree/TreeSessionMemory";
-import { EmptyToolRegistry } from "../../src/adapters/tools/EmptyToolRegistry";
-import { Agent } from "../../src/core/agent/Agent";
+import { JsonlSessionStore } from "../../../src/adapters/file-system/JsonlSessionStore";
+import { TreeSessionMemory } from "../../../src/adapters/memory/tree/TreeSessionMemory";
+import { EmptyToolRegistry } from "../../../src/adapters/tools/EmptyToolRegistry";
+import { Agent } from "../../../src/core/agent/Agent";
 import type {
   ResponsesRequest,
   ResponsesStreamEvent,
-} from "../../src/core/responses/ResponsesTransport";
-import { SessionManager } from "../../src/core/sessions/SessionManager";
+} from "../../../src/core/responses/ResponsesTransport.interface";
+import { SessionManager } from "../../../src/core/sessions/SessionManager";
 
 class ScriptedTransport {
   readonly requests: ResponsesRequest[] = [];

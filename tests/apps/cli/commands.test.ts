@@ -1,4 +1,4 @@
-import { applyCliSettingsCommand } from "../../src/apps/cli/commands";
+import { applyCliSettingsCommand } from "../../../src/apps/cli/commands";
 
 test("CLI settings commands patch branch-local response settings", () => {
   const initial = {

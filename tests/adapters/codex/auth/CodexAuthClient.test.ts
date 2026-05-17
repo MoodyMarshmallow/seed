@@ -2,30 +2,8 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { CodexAuthClient } from "../../src/adapters/codex/auth/CodexAuthClient";
-import { JsonFileTokenStore } from "../../src/adapters/file-system/JsonFileTokenStore";
-import { ensureCliAuth } from "../../src/apps/cli/auth";
-
-test("file token store persists and reloads local Codex auth tokens", async () => {
-  const cwd = await mkdtemp(join(tmpdir(), "agent-auth-"));
-  const store = new JsonFileTokenStore({
-    filePath: join(cwd, ".agent", "auth.json"),
-  });
-
-  await store.write({
-    accessToken: "access",
-    refreshToken: "refresh",
-    expiresAt: 123,
-    account: { email: "milo@example.com", planType: "plus" },
-  });
-
-  await expect(store.read()).resolves.toEqual({
-    accessToken: "access",
-    refreshToken: "refresh",
-    expiresAt: 123,
-    account: { email: "milo@example.com", planType: "plus" },
-  });
-});
+import { CodexAuthClient } from "../../../../src/adapters/codex/auth/CodexAuthClient";
+import { JsonFileTokenStore } from "../../../../src/adapters/file-system/JsonFileTokenStore";
 
 test("Codex auth client lazily refreshes tokens that are near expiry", async () => {
   const cwd = await mkdtemp(join(tmpdir(), "agent-refresh-"));
@@ -92,40 +70,4 @@ test("Codex auth client exchanges OAuth authorization codes into local tokens", 
     refreshToken: "refresh-from-code",
     account: null,
   });
-});
-
-test("CLI auth starts OAuth when no local token exists", async () => {
-  let openedUrl: string | null = null;
-  let exchangedAuthorizationCode: string | null = null;
-  const output: string[] = [];
-
-  await ensureCliAuth({
-    headless: false,
-    output: (line) => output.push(line),
-    tokenStore: {
-      read: async () => null,
-      write: async () => undefined,
-      clear: async () => undefined,
-    },
-    oauthFlow: {
-      start: async () => ({
-        loginId: "login_1",
-        authUrl: "https://auth.example/login",
-        redirectUri: "http://localhost/callback",
-        codeVerifier: "verifier",
-        waitForCode: async () => "oauth-code",
-        cancel: async () => undefined,
-      }),
-    },
-    openUrl: async (url) => {
-      openedUrl = url;
-    },
-    exchangeAuthorizationCode: async ({ authorizationCode }) => {
-      exchangedAuthorizationCode = authorizationCode;
-    },
-  });
-
-  expect(openedUrl).toBe("https://auth.example/login");
-  expect(exchangedAuthorizationCode).toBe("oauth-code");
-  expect(output.join("\n")).toContain("No local Codex login found");
 });

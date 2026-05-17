@@ -2,8 +2,8 @@ import {
   formatConversationChoices,
   resolveConversationSelection,
   selectInitialConversation,
-} from "../../src/apps/cli/conversationSelection";
-import type { AgentConfig } from "../../src/config/schema";
+} from "../../../src/apps/cli/conversationSelection";
+import type { AgentConfig } from "../../../src/config/schema";
 
 const config: AgentConfig = {
   systemPrompt: "Be useful.",

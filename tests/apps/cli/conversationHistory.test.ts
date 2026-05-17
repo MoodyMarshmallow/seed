@@ -1,4 +1,4 @@
-import { renderConversationHistory } from "../../src/apps/cli/conversationHistory";
+import { renderConversationHistory } from "../../../src/apps/cli/conversationHistory";
 
 test("renders active conversation history for resumed conversations", async () => {
   const output = await renderConversationHistory(
