@@ -4,9 +4,10 @@
 
 ## Domain Terms
 
-- **Agent**: The core orchestrator that runs turns through injected ports.
-- **Port**: A stable interface that production apps can replace, such as memory, token storage, model transport, or tool execution.
-- **Adapter**: A concrete implementation of a port shipped for local template use.
+- **Agent**: The core orchestrator that runs turns through injected interfaces.
+- **Interface**: A stable replaceable contract, such as memory, token storage, model transport, or tool execution.
+- **Adapter**: A concrete implementation of an interface shipped for local template use.
+- **Feature module**: Runtime behavior or orchestration code, such as the Agent, SessionManager, config loader, or CLI harness.
 - **Conversation**: A user-facing chat history that can be resumed, displayed, and extended.
 - **Memory**: The agent-facing module that prepares model context and records conversation events. The Agent must not depend on a tree, JSONL, or conversation implementation directly.
 - **Initial context**: The system prompt and initial settings used when a conversation is created.

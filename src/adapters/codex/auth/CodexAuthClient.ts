@@ -1,7 +1,7 @@
 import type {
   CodexTokenRecord,
   TokenStore,
-} from "../../../core/auth/TokenStore";
+} from "../../../core/auth/TokenStore.interface";
 import { AgentError } from "../../../core/errors/AgentError";
 
 const OPENAI_AUTH_ISSUER = "https://auth.openai.com";

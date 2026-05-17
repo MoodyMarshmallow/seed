@@ -2,8 +2,8 @@ import type {
   AgentMemory,
   AssistantContentBlock,
   MemoryRecord,
-} from "../../../core/memory/AgentMemory";
-import type { ResponsesMessageInput } from "../../../core/responses/ResponsesTransport";
+} from "../../../core/memory/AgentMemory.interface";
+import type { ResponsesMessageInput } from "../../../core/responses/ResponsesTransport.interface";
 import type { SessionManager } from "../../../core/sessions/SessionManager";
 import type {
   MessageContentBlock,

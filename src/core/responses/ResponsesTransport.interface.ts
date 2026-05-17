@@ -1,5 +1,5 @@
 import type { ResponseSettings } from "../sessions/entries";
-import type { ToolDefinition } from "../tools/ToolRegistry";
+import type { ToolDefinition } from "../tools/ToolRegistry.interface";
 
 export interface ResponsesMessageInput {
   readonly role: "user" | "assistant" | "tool_result";

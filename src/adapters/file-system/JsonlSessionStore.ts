@@ -2,7 +2,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { AgentError } from "../../core/errors/AgentError";
-import type { SessionStore } from "../../core/sessions/SessionStore";
+import type { SessionStore } from "../../core/sessions/SessionStore.interface";
 import type {
   SessionEntry,
   SessionHeader,

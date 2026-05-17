@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import type { SessionStore } from "./SessionStore";
+import type { SessionStore } from "./SessionStore.interface";
 import type {
   MessageEntry,
   ResponseSettings,

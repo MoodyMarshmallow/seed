@@ -1,6 +1,9 @@
-import type { ResponsesMessageInput } from "../responses/ResponsesTransport";
+import type { ResponsesMessageInput } from "../responses/ResponsesTransport.interface";
 import type { ResponseSettings } from "../sessions/entries";
-import type { ToolCallRequest, ToolCallResult } from "../tools/ToolRegistry";
+import type {
+  ToolCallRequest,
+  ToolCallResult,
+} from "../tools/ToolRegistry.interface";
 
 interface PreparedTurn {
   readonly systemPrompt: string;

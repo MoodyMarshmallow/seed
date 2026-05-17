@@ -2,7 +2,7 @@ import { AgentError } from "../../core/errors/AgentError";
 import type {
   ToolCallRequest,
   ToolRegistry,
-} from "../../core/tools/ToolRegistry";
+} from "../../core/tools/ToolRegistry.interface";
 
 /** Tool registry for projects that have not wired external tools yet. */
 export class EmptyToolRegistry implements ToolRegistry {

@@ -1,6 +1,12 @@
-import type { AgentMemory, AssistantContentBlock } from "../memory/AgentMemory";
-import type { ResponsesTransport } from "../responses/ResponsesTransport";
-import type { ToolCallRequest, ToolRegistry } from "../tools/ToolRegistry";
+import type {
+  AgentMemory,
+  AssistantContentBlock,
+} from "../memory/AgentMemory.interface";
+import type { ResponsesTransport } from "../responses/ResponsesTransport.interface";
+import type {
+  ToolCallRequest,
+  ToolRegistry,
+} from "../tools/ToolRegistry.interface";
 import type { AgentTurnEvent } from "./events";
 
 export interface AgentOptions {

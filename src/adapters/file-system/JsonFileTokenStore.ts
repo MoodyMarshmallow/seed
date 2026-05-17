@@ -3,7 +3,10 @@ import { dirname } from "node:path";
 
 import { z } from "zod";
 
-import type { CodexTokenRecord, TokenStore } from "../../core/auth/TokenStore";
+import type {
+  CodexTokenRecord,
+  TokenStore,
+} from "../../core/auth/TokenStore.interface";
 import { AgentError } from "../../core/errors/AgentError";
 
 const tokenRecordSchema = z.object({

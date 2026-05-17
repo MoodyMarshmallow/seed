@@ -1,4 +1,4 @@
-import type { ResponsesRequest } from "../../../core/responses/ResponsesTransport";
+import type { ResponsesRequest } from "../../../core/responses/ResponsesTransport.interface";
 
 export function buildCodexResponsesBody(
   request: ResponsesRequest,

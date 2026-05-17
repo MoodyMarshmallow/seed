@@ -50,13 +50,13 @@ src/
   apps/cli/       Thin runnable harness that composes core + adapters
 ```
 
-Core code depends on explicit ports instead of constructing defaults internally:
+Core code depends on explicit interfaces instead of constructing defaults internally:
 
-- `AgentMemory` prepares model context and records conversation events.
-- `SessionStore` currently persists versioned conversation records.
-- `TokenStore` persists local Codex subscription tokens.
-- `ResponsesTransport` streams normalized Responses events.
-- `ToolRegistry` lists and executes tools.
+- `AgentMemory.interface.ts` prepares model context and records conversation events.
+- `SessionStore.interface.ts` currently persists versioned conversation records.
+- `TokenStore.interface.ts` persists local Codex subscription tokens.
+- `ResponsesTransport.interface.ts` streams normalized Responses events.
+- `ToolRegistry.interface.ts` lists and executes tools.
 
 Concrete adapters are replaceable:
 
@@ -76,6 +76,12 @@ apps/cli/*    -> core/* + adapters/* + config/*
 ```
 
 There are no barrel files. Direct imports are preferred so the seam being used is visible at each call site.
+
+File roles are named explicitly:
+
+- `*.interface.ts` files contain replaceable contracts only.
+- `src/adapters/**` files contain concrete implementations of interfaces.
+- Other source files are feature modules that implement runtime behavior, orchestration, parsing, or composition.
 
 ## Conversations
 

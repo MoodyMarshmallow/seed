@@ -3,7 +3,7 @@ import type {
   ResponsesRequest,
   ResponsesStreamEvent,
   ResponsesTransport,
-} from "../../../core/responses/ResponsesTransport";
+} from "../../../core/responses/ResponsesTransport.interface";
 import { mapResponsesEvent, parseSseMessages } from "./responsesEvents";
 import { buildCodexResponsesBody } from "./responsesRequest";
 

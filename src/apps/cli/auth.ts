@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 
 import type { CodexOAuthLogin } from "../../adapters/codex/auth/CodexOAuthFlow";
-import type { TokenStore } from "../../core/auth/TokenStore";
+import type { TokenStore } from "../../core/auth/TokenStore.interface";
 
 interface OAuthFlowPort {
   readonly start: () => Promise<CodexOAuthLogin>;
