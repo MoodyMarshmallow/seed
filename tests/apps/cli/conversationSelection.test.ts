@@ -16,7 +16,7 @@ test("formats existing conversations as a numbered startup menu", () => {
   const menu = formatConversationChoices([
     {
       id: "da5a5db6-4498-4d09-8729-3c2a222c2853",
-      filePath: "/tmp/session.jsonl",
+      filePath: "/tmp/conversation.jsonl",
       timestamp: "2026-05-16T12:00:00.000Z",
       leafId: "leaf_1",
     },
@@ -43,13 +43,13 @@ test("resolves numbered conversation selections", () => {
 
 test("selects an existing conversation by number without requiring users to remember IDs", async () => {
   const writes: string[] = [];
-  const session = await selectInitialConversation({
+  const conversation = await selectInitialConversation({
     config,
     sessions: {
       listSessions: async () => [
         {
-          id: "session_1",
-          filePath: "/tmp/session_1.jsonl",
+          id: "conversation_1",
+          filePath: "/tmp/conversation_1.jsonl",
           timestamp: "2026-05-16T12:00:00.000Z",
           leafId: "leaf_1",
         },
@@ -64,9 +64,9 @@ test("selects an existing conversation by number without requiring users to reme
     },
   });
 
-  expect(session).toEqual({
-    id: "session_1",
-    filePath: "/tmp/session_1.jsonl",
+  expect(conversation).toEqual({
+    id: "conversation_1",
+    filePath: "/tmp/conversation_1.jsonl",
     trunkLeafId: "leaf_1",
   });
   expect(writes.join("\n")).toContain("Choose a conversation");

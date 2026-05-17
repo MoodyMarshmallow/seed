@@ -1,8 +1,8 @@
 export type AgentErrorCode =
   | "config_invalid"
   | "config_missing"
-  | "session_invalid"
-  | "session_missing"
+  | "conversation_invalid"
+  | "conversation_missing"
   | "auth_missing"
   | "auth_failed"
   | "transport_failed"

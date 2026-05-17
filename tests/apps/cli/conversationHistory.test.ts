@@ -4,7 +4,7 @@ test("renders active conversation history for resumed conversations", async () =
   const output = await renderConversationHistory(
     {
       buildContext: async () => ({
-        sessionId: "session_1",
+        sessionId: "conversation_1",
         leafId: "leaf_1",
         systemPrompt: "Be useful.",
         settings: { model: "gpt-5.5", responseOverrides: {} },
@@ -31,7 +31,7 @@ test("renders active conversation history for resumed conversations", async () =
         ],
       }),
     },
-    "session_1",
+    "conversation_1",
   );
 
   expect(output).toContain("Previous conversation:");
@@ -44,7 +44,7 @@ test("renders consecutive history text chunks inline like streaming output", asy
   const output = await renderConversationHistory(
     {
       buildContext: async () => ({
-        sessionId: "session_1",
+        sessionId: "conversation_1",
         leafId: "leaf_1",
         systemPrompt: "Be useful.",
         settings: { model: "gpt-5.5", responseOverrides: {} },
@@ -64,7 +64,7 @@ test("renders consecutive history text chunks inline like streaming output", asy
         ],
       }),
     },
-    "session_1",
+    "conversation_1",
   );
 
   expect(output).toContain("Assistant:\nI'm an AI assistant.");
@@ -76,14 +76,14 @@ test("renders no history block for a new empty conversation", async () => {
     renderConversationHistory(
       {
         buildContext: async () => ({
-          sessionId: "session_1",
+          sessionId: "conversation_1",
           leafId: "leaf_1",
           systemPrompt: "Be useful.",
           settings: { model: "gpt-5.5", responseOverrides: {} },
           messages: [],
         }),
       },
-      "session_1",
+      "conversation_1",
     ),
   ).resolves.toBe("");
 });

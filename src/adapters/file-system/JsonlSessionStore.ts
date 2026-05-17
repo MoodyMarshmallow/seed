@@ -49,8 +49,8 @@ export class JsonlSessionStore implements SessionStore {
     const [headerLine, ...entryLines] = lines;
     if (!headerLine) {
       throw new AgentError({
-        code: "session_invalid",
-        message: `Session file ${filePath} is empty.`,
+        code: "conversation_invalid",
+        message: `Conversation file ${filePath} is empty.`,
       });
     }
 
@@ -63,8 +63,8 @@ export class JsonlSessionStore implements SessionStore {
       };
     } catch (cause) {
       throw new AgentError({
-        code: "session_invalid",
-        message: `Session file ${filePath} is invalid.`,
+        code: "conversation_invalid",
+        message: `Conversation file ${filePath} is invalid.`,
         cause,
       });
     }
@@ -121,8 +121,8 @@ export class JsonlSessionStore implements SessionStore {
     );
     if (!match) {
       throw new AgentError({
-        code: "session_missing",
-        message: `Session ${sessionId} does not exist.`,
+        code: "conversation_missing",
+        message: `Conversation ${sessionId} does not exist.`,
       });
     }
     return match.filePath;
