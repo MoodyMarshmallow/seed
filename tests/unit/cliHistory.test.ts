@@ -1,7 +1,7 @@
-import { renderSessionHistory } from "../../src/apps/cli/history";
+import { renderConversationHistory } from "../../src/apps/cli/conversationHistory";
 
-test("renders active session chat history for resumed sessions", async () => {
-  const output = await renderSessionHistory(
+test("renders active conversation history for resumed conversations", async () => {
+  const output = await renderConversationHistory(
     {
       buildContext: async () => ({
         sessionId: "session_1",
@@ -41,7 +41,7 @@ test("renders active session chat history for resumed sessions", async () => {
 });
 
 test("renders consecutive history text chunks inline like streaming output", async () => {
-  const output = await renderSessionHistory(
+  const output = await renderConversationHistory(
     {
       buildContext: async () => ({
         sessionId: "session_1",
@@ -71,9 +71,9 @@ test("renders consecutive history text chunks inline like streaming output", asy
   expect(output).not.toContain("I\n'm\n an AI assistant.");
 });
 
-test("renders no history block for a new empty session", async () => {
+test("renders no history block for a new empty conversation", async () => {
   await expect(
-    renderSessionHistory(
+    renderConversationHistory(
       {
         buildContext: async () => ({
           sessionId: "session_1",

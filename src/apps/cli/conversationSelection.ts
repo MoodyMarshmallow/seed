@@ -5,29 +5,29 @@ import type {
 } from "../../core/sessions/SessionManager";
 import type { SessionSummary } from "../../core/sessions/entries";
 
-type SessionSelectionManager = Pick<
+type ConversationSelectionManager = Pick<
   SessionManager,
   "listSessions" | "createSession"
 >;
 
-export interface SessionSelectionIo {
+export interface ConversationSelectionIo {
   readonly question: (prompt: string) => Promise<string>;
   readonly write: (text: string) => void;
 }
 
-export function formatSessionChoices(
-  sessions: readonly SessionSummary[],
+export function formatConversationChoices(
+  conversations: readonly SessionSummary[],
 ): string {
-  const lines = ["Choose a session:", "  1. New session"];
-  sessions.forEach((session, index) => {
-    lines.push(`  ${index + 2}. ${formatSessionLabel(session)}`);
+  const lines = ["Choose a conversation:", "  1. New conversation"];
+  conversations.forEach((conversation, index) => {
+    lines.push(`  ${index + 2}. ${formatConversationLabel(conversation)}`);
   });
   return `${lines.join("\n")}\n`;
 }
 
-export function resolveSessionSelection(
+export function resolveConversationSelection(
   input: string,
-  sessionCount: number,
+  conversationCount: number,
 ):
   | { readonly type: "new" }
   | { readonly type: "existing"; readonly index: number }
@@ -40,28 +40,30 @@ export function resolveSessionSelection(
     return { type: "new" };
   }
   const index = selected - 2;
-  if (index >= 0 && index < sessionCount) {
+  if (index >= 0 && index < conversationCount) {
     return { type: "existing", index };
   }
   return null;
 }
 
-/** Presents saved sessions by number so users do not need to remember IDs. */
-export async function selectInitialSession(input: {
-  readonly sessions: SessionSelectionManager;
+/** Presents saved conversations by number so users do not need to remember IDs. */
+export async function selectInitialConversation(input: {
+  readonly sessions: ConversationSelectionManager;
   readonly config: AgentConfig;
-  readonly io: SessionSelectionIo;
+  readonly io: ConversationSelectionIo;
 }): Promise<CreatedSession> {
   const existing = await input.sessions.listSessions();
   if (existing.length === 0) {
-    input.io.write("No existing sessions found. Creating a new session.\n");
+    input.io.write(
+      "No existing conversations found. Creating a new conversation.\n",
+    );
     return input.sessions.createSession(input.config);
   }
 
-  input.io.write(formatSessionChoices(existing));
+  input.io.write(formatConversationChoices(existing));
   while (true) {
-    const answer = await input.io.question("Select session number: ");
-    const selection = resolveSessionSelection(answer, existing.length);
+    const answer = await input.io.question("Select conversation number: ");
+    const selection = resolveConversationSelection(answer, existing.length);
     if (!selection) {
       input.io.write(`Enter a number from 1 to ${existing.length + 1}.\n`);
       continue;
@@ -83,6 +85,6 @@ export async function selectInitialSession(input: {
   }
 }
 
-function formatSessionLabel(session: SessionSummary): string {
-  return `${new Date(session.timestamp).toLocaleString()} (${session.id.slice(0, 8)})`;
+function formatConversationLabel(conversation: SessionSummary): string {
+  return `${new Date(conversation.timestamp).toLocaleString()} (${conversation.id.slice(0, 8)})`;
 }

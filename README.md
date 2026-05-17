@@ -16,13 +16,13 @@ bun run agent
 The CLI stores local development state under `.agent/`, which is gitignored:
 
 - `.agent/auth.json` for local Codex OAuth tokens.
-- `.agent/sessions/*.jsonl` for append-only session trees.
+- `.agent/sessions/*.jsonl` for append-only conversation storage.
 
 If `.agent/auth.json` does not exist, `bun run agent` starts the local OAuth flow before opening the chat. Use `bun run agent --headless-auth` to print the authorization URL without opening a browser.
 
 ## Configuration
 
-New sessions snapshot `agent.config.json` into the session trunk:
+New conversations snapshot `agent.config.json` into their initial context:
 
 ```json
 {
@@ -44,7 +44,7 @@ The source tree is organized by seam ownership:
 
 ```text
 src/
-  core/           Framework-neutral orchestration, contracts, and session model
+  core/           Framework-neutral orchestration, contracts, and memory model
   adapters/       Replaceable Codex, filesystem, and tool implementations
   config/         Version-controlled project config loading and validation
   apps/cli/       Thin runnable harness that composes core + adapters
@@ -52,14 +52,14 @@ src/
 
 Core code depends on explicit ports instead of constructing defaults internally:
 
-- `SessionStore` persists versioned tree sessions.
+- `SessionStore` currently persists versioned conversation records.
 - `TokenStore` persists local Codex subscription tokens.
 - `ResponsesTransport` streams normalized Responses events.
 - `ToolRegistry` lists and executes tools.
 
 Concrete adapters are replaceable:
 
-- `JsonlSessionStore` writes append-only JSONL session files.
+- `JsonlSessionStore` writes append-only JSONL conversation files.
 - `JsonFileTokenStore` writes project-local auth JSON.
 - `CodexResponsesTransport` calls the internal Codex Responses endpoint with injected `fetch`.
 - `EmptyToolRegistry` exposes no tools and returns structured unavailable-tool results.
@@ -75,16 +75,16 @@ apps/cli/*    -> core/* + adapters/* + config/*
 
 There are no barrel files. Direct imports are preferred so the seam being used is visible at each call site.
 
-## Sessions
+## Conversations
 
-Sessions are versioned JSONL trees. Every entry has an `id`, `parentId`, and timestamp. New sessions start with a shared trunk:
+Conversations are currently stored as versioned JSONL records. Every entry has an `id`, `parentId`, and timestamp. New conversations start with initial context:
 
 1. `system_prompt`
 2. `settings`
 
-User turns append descendants from the current leaf. Branch-local settings are represented as entries, so future tree navigation can diverge model, reasoning, or arbitrary Responses overrides per branch.
+User turns append descendants from the current leaf. Branch-local settings are represented as entries, so future navigation can diverge model, reasoning, or arbitrary Responses overrides per branch.
 
-Compaction is not implemented yet, but the `compaction` entry contract exists so downstream projects can add summarization without changing the session format shape.
+Compaction is not implemented yet, but the `compaction` entry contract exists so downstream projects can add summarization without changing the conversation storage format shape.
 
 ## Reasoning And Outputs
 
@@ -112,7 +112,7 @@ The CLI is not intended as the downstream product interface. It composes the fil
 The test suite uses Vitest and covers:
 
 - Config validation.
-- JSONL session trunk and context building.
+- JSONL conversation initial context and context building.
 - File token persistence and lazy refresh.
 - Streaming Responses parsing and request construction.
 - Library-level agent turns with missing tool-call recovery.

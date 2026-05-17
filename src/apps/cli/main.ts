@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 import { applyCliSettingsCommand, helpText } from "./commands";
 import { composeCliAgent } from "./compose";
-import { renderSessionHistory } from "./history";
+import { renderConversationHistory } from "./conversationHistory";
+import { selectInitialConversation } from "./conversationSelection";
 import { createCliReadline } from "./readline";
 import { CliTurnRenderer } from "./render";
-import { selectInitialSession } from "./sessionSelection";
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
@@ -20,7 +20,7 @@ async function main(): Promise<void> {
   const rl = createCliReadline();
   let session = args.includes("--resume")
     ? await sessions.continueRecentOrCreate(config)
-    : await selectInitialSession({
+    : await selectInitialConversation({
         sessions,
         config,
         io: {
@@ -28,8 +28,8 @@ async function main(): Promise<void> {
           write: (text) => process.stdout.write(text),
         },
       });
-  process.stdout.write(`Session ${session.id}\n`);
-  process.stdout.write(await renderSessionHistory(sessions, session.id));
+  process.stdout.write(`Conversation ${session.id}\n`);
+  process.stdout.write(await renderConversationHistory(sessions, session.id));
   try {
     while (true) {
       const input = (await rl.question("> ")).trim();
@@ -41,13 +41,15 @@ async function main(): Promise<void> {
       }
       if (input === "/new") {
         session = await sessions.createSession(config);
-        process.stdout.write(`Session ${session.id}\n`);
+        process.stdout.write(`Conversation ${session.id}\n`);
         continue;
       }
       if (input === "/resume") {
         session = await sessions.continueRecentOrCreate(config);
-        process.stdout.write(`Session ${session.id}\n`);
-        process.stdout.write(await renderSessionHistory(sessions, session.id));
+        process.stdout.write(`Conversation ${session.id}\n`);
+        process.stdout.write(
+          await renderConversationHistory(sessions, session.id),
+        );
         continue;
       }
       if (

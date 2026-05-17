@@ -17,8 +17,8 @@ Chat commands:
   /model <model>          Change the branch-local model setting
   /reasoning <effort>     Change branch-local reasoning effort
   /set-json <json>        Merge arbitrary Responses overrides
-  /new                    Start a new session
-  /resume                 Resume the most recent session
+  /new                    Start a new conversation
+  /resume                 Resume the most recent conversation
   /exit                   Quit
 `;
 }

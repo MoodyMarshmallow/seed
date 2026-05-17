@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { AgentError } from "../core/errors/AgentError";
 import { type AgentConfig, agentConfigSchema } from "./schema";
 
-/** Loads and validates the version-controlled defaults used to seed new sessions. */
 export async function loadAgentConfig(cwd: string): Promise<AgentConfig> {
   const configPath = join(cwd, "agent.config.json");
   let raw: string;

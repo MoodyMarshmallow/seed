@@ -1,12 +1,12 @@
 import type { SessionManager } from "../../core/sessions/SessionManager";
 import type { MessageEntry } from "../../core/sessions/entries";
 
-/** Renders the active branch history for a resumed session. */
-export async function renderSessionHistory(
+/** Renders the active branch history for a resumed conversation. */
+export async function renderConversationHistory(
   sessions: Pick<SessionManager, "buildContext">,
-  sessionId: string,
+  conversationId: string,
 ): Promise<string> {
-  const context = await sessions.buildContext(sessionId);
+  const context = await sessions.buildContext(conversationId);
   if (context.messages.length === 0) {
     return "";
   }
