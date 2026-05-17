@@ -10,7 +10,7 @@ import type {
   MessageEntry,
 } from "../../../core/sessions/entries";
 
-/** Adapts the current tree-shaped Session implementation to the Agent Memory seam. */
+/** Adapts the current tree-shaped conversation implementation to the Agent Memory seam. */
 export class TreeSessionMemory implements AgentMemory {
   readonly #sessions: SessionManager;
 

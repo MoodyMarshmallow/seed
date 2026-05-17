@@ -18,7 +18,7 @@ interface JsonlSessionStoreOptions {
   readonly rootDir: string;
 }
 
-/** File-backed append-only JSONL session store used by the CLI harness and tests. */
+/** File-backed append-only JSONL conversation store used by the CLI harness and tests. */
 export class JsonlSessionStore implements SessionStore {
   readonly #rootDir: string;
   readonly #pathsById = new Map<string, string>();

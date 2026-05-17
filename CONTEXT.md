@@ -8,7 +8,7 @@
 - **Port**: A stable interface that production apps can replace, such as memory, token storage, model transport, or tool execution.
 - **Adapter**: A concrete implementation of a port shipped for local template use.
 - **Conversation**: A user-facing chat history that can be resumed, displayed, and extended.
-- **Memory**: The agent-facing module that prepares model context and records conversation events. The Agent must not depend on a tree, JSONL, or Session implementation directly.
+- **Memory**: The agent-facing module that prepares model context and records conversation events. The Agent must not depend on a tree, JSONL, or conversation implementation directly.
 - **Initial context**: The system prompt and initial settings used when a conversation is created.
 - **Branch-local settings**: Settings entries that affect only descendants on their tree path.
 - **CLI harness**: The runnable command used for local E2E development, not the stable downstream product interface.

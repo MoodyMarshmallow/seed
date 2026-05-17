@@ -26,7 +26,7 @@ export interface CreatedSession {
   readonly trunkLeafId: string;
 }
 
-/** Manages versioned tree sessions and builds the active root-to-leaf context. */
+/** Manages versioned tree conversations and builds the active root-to-leaf context. */
 export class SessionManager {
   readonly #cwd: string;
   readonly #store: SessionStore;
