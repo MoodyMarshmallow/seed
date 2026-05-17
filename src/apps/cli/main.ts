@@ -14,7 +14,7 @@ async function main(): Promise<void> {
   }
 
   const cwd = process.env.SEED_CWD ?? process.cwd();
-  const { config, sessions, agent } = await composeCliAgent(cwd, {
+  const { config, sessions, memory, agent } = await composeCliAgent(cwd, {
     headlessAuth: args.includes("--headless-auth"),
   });
   const rl = createCliReadline();
@@ -57,18 +57,21 @@ async function main(): Promise<void> {
         input.startsWith("/reasoning ") ||
         input.startsWith("/set-json ")
       ) {
-        const context = await sessions.buildContext(session.id);
-        await sessions.appendSettings(
-          session.id,
-          applyCliSettingsCommand(context.settings, input),
-        );
+        const context = await memory.prepareTurn({
+          conversationId: session.id,
+        });
+        await memory.record({
+          type: "settings_changed",
+          conversationId: session.id,
+          settings: applyCliSettingsCommand(context.settings, input),
+        });
         process.stdout.write("Settings updated.\n");
         continue;
       }
 
       const renderer = new CliTurnRenderer();
       for await (const event of agent.runTurn({
-        sessionId: session.id,
+        conversationId: session.id,
         input,
       })) {
         const rendered = renderer.render(event);

@@ -5,6 +5,7 @@ import { CodexOAuthFlow } from "../../adapters/codex/auth/CodexOAuthFlow";
 import { CodexResponsesTransport } from "../../adapters/codex/responses/CodexResponsesTransport";
 import { JsonFileTokenStore } from "../../adapters/file-system/JsonFileTokenStore";
 import { JsonlSessionStore } from "../../adapters/file-system/JsonlSessionStore";
+import { TreeSessionMemory } from "../../adapters/memory/tree/TreeSessionMemory";
 import { EmptyToolRegistry } from "../../adapters/tools/EmptyToolRegistry";
 import { loadAgentConfig } from "../../config/config";
 import { Agent } from "../../core/agent/Agent";
@@ -40,5 +41,11 @@ export async function composeCliAgent(
     getAccessToken: () => auth.getAccessToken(),
   });
   const tools = new EmptyToolRegistry();
-  return { config, sessions, agent: new Agent({ sessions, transport, tools }) };
+  const memory = new TreeSessionMemory(sessions);
+  return {
+    config,
+    sessions,
+    memory,
+    agent: new Agent({ memory, transport, tools }),
+  };
 }

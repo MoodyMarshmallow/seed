@@ -52,6 +52,7 @@ src/
 
 Core code depends on explicit ports instead of constructing defaults internally:
 
+- `AgentMemory` prepares model context and records conversation events.
 - `SessionStore` currently persists versioned conversation records.
 - `TokenStore` persists local Codex subscription tokens.
 - `ResponsesTransport` streams normalized Responses events.
@@ -60,6 +61,7 @@ Core code depends on explicit ports instead of constructing defaults internally:
 Concrete adapters are replaceable:
 
 - `JsonlSessionStore` writes append-only JSONL conversation files.
+- `TreeSessionMemory` adapts the current tree-shaped conversation storage to `AgentMemory`.
 - `JsonFileTokenStore` writes project-local auth JSON.
 - `CodexResponsesTransport` calls the internal Codex Responses endpoint with injected `fetch`.
 - `EmptyToolRegistry` exposes no tools and returns structured unavailable-tool results.
@@ -105,7 +107,7 @@ The CLI supports:
 - `/resume`
 - `/exit`
 
-The CLI is not intended as the downstream product interface. It composes the file stores, Codex auth client, Codex transport, empty tools, and `Agent` to prove the library works end-to-end.
+The CLI is not intended as the downstream product interface. It composes the file stores, tree-backed memory adapter, Codex auth client, Codex transport, empty tools, and `Agent` to prove the system works end-to-end.
 
 ## Testing
 
@@ -113,6 +115,7 @@ The test suite uses Vitest and covers:
 
 - Config validation.
 - JSONL conversation initial context and context building.
+- Tree-backed Memory projection into model input.
 - File token persistence and lazy refresh.
 - Streaming Responses parsing and request construction.
 - Library-level agent turns with missing tool-call recovery.

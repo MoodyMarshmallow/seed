@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { JsonlSessionStore } from "../../src/adapters/file-system/JsonlSessionStore";
+import { TreeSessionMemory } from "../../src/adapters/memory/tree/TreeSessionMemory";
 import { EmptyToolRegistry } from "../../src/adapters/tools/EmptyToolRegistry";
 import { Agent } from "../../src/core/agent/Agent";
 import type {
@@ -55,15 +56,16 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
     responseOverrides: {},
   });
   const transport = new ScriptedTransport();
+  const memory = new TreeSessionMemory(sessions);
   const agent = new Agent({
-    sessions,
+    memory,
     transport,
     tools: new EmptyToolRegistry(),
   });
 
   const observed = [];
   for await (const event of agent.runTurn({
-    sessionId: session.id,
+    conversationId: session.id,
     input: "Please inspect.",
   })) {
     observed.push(event.type);
@@ -120,13 +122,17 @@ test("agent turn yields streaming text before the transport finishes", async () 
       yield { type: "completed", raw: {} };
     },
   };
+  const memory = new TreeSessionMemory(sessions);
   const agent = new Agent({
-    sessions,
+    memory,
     transport,
     tools: new EmptyToolRegistry(),
   });
 
-  const iterator = agent.runTurn({ sessionId: session.id, input: "Say hi." });
+  const iterator = agent.runTurn({
+    conversationId: session.id,
+    input: "Say hi.",
+  });
   const first = await iterator.next();
 
   expect(first).toEqual({

@@ -10,7 +10,7 @@ export interface ToolCallRequest {
   readonly input: unknown;
 }
 
-interface ToolCallResult {
+export interface ToolCallResult {
   readonly callId: string;
   readonly name: string;
   readonly output: string;
