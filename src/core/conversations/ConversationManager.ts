@@ -81,31 +81,9 @@ export class ConversationManager {
     const latestTurn = turns.at(-1);
 
     if (message.role === "user") {
-      if (latestTurn?.status === "open") {
-        throw new AgentError({
-          code: "conversation_invalid",
-          message: "Cannot start a new turn while another turn is open.",
-        });
-      }
-      turns.push({
-        id: createTurnId(),
-        timestamp: nowIso(),
-        status: "open",
-        messages: [message],
-      });
-    } else if (latestTurn?.status === "open") {
-      turns[turns.length - 1] = {
-        ...latestTurn,
-        status: assistantMessageCompletesTurn(message)
-          ? "completed"
-          : latestTurn.status,
-        messages: [...latestTurn.messages, message],
-      };
+      this.#recordUserMessage(turns, latestTurn, message);
     } else {
-      throw new AgentError({
-        code: "conversation_invalid",
-        message: "Cannot append an agent message without an open turn.",
-      });
+      this.#recordAgentMessage(turns, latestTurn, message);
     }
 
     await this.#store.write({
@@ -113,6 +91,45 @@ export class ConversationManager {
       turns,
     });
     return message;
+  }
+
+  #recordUserMessage(
+    turns: ConversationTurn[],
+    latestTurn: ConversationTurn | undefined,
+    message: ConversationMessage,
+  ) {
+    if (latestTurn?.status === "open") {
+      throw new AgentError({
+        code: "conversation_invalid",
+        message: "Cannot start a new turn while another turn is open.",
+      });
+    }
+
+    turns.push({
+      id: createTurnId(),
+      timestamp: nowIso(),
+      status: "open",
+      messages: [message],
+    });
+  }
+
+  #recordAgentMessage(
+    turns: ConversationTurn[],
+    latestTurn: ConversationTurn | undefined,
+    message: ConversationMessage,
+  ) {
+    if (latestTurn?.status !== "open") {
+      throw new AgentError({
+        code: "conversation_invalid",
+        message: "Cannot append an agent message without an open turn.",
+      });
+    }
+
+    turns[turns.length - 1] = {
+      ...latestTurn,
+      status: messageCompletesTurn(message) ? "completed" : latestTurn.status,
+      messages: [...latestTurn.messages, message],
+    };
   }
 
   async updateSettings(
@@ -149,9 +166,9 @@ export class ConversationManager {
   }
 }
 
-function assistantMessageCompletesTurn(message: ConversationMessage) {
-  if (message.role !== "assistant") {
-    return false;
-  }
-  return !message.content.some((block) => block.type === "tool_call");
+function messageCompletesTurn(message: ConversationMessage) {
+  return (
+    message.role === "assistant" &&
+    !message.content.some((block) => block.type === "tool_call")
+  );
 }
