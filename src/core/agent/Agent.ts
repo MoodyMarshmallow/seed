@@ -3,10 +3,8 @@ import type {
   AssistantContentBlock,
 } from "../memory/AgentMemory.interface";
 import type { ResponsesTransport } from "../responses/ResponsesTransport.interface";
-import type {
-  ToolCallRequest,
-  ToolRegistry,
-} from "../tools/ToolRegistry.interface";
+import type { ToolCallRequest } from "../tools/Tool.interface";
+import type { ToolRegistry } from "../tools/ToolRegistry";
 import type { AgentTurnEvent } from "./events";
 
 export interface AgentOptions {

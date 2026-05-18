@@ -1,5 +1,5 @@
 import type { ResponseSettings } from "../conversations/entries";
-import type { ToolDefinition } from "../tools/ToolRegistry.interface";
+import type { ToolDefinition } from "../tools/Tool.interface";
 
 export interface ResponsesMessageInput {
   readonly role: "user" | "assistant" | "tool_result";

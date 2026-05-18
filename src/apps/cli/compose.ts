@@ -6,10 +6,11 @@ import { CodexResponsesTransport } from "../../adapters/codex/responses/CodexRes
 import { JsonFileTokenStore } from "../../adapters/file-system/JsonFileTokenStore";
 import { JsonlConversationStore } from "../../adapters/file-system/JsonlConversationStore";
 import { ConversationMemory } from "../../adapters/memory/conversation/ConversationMemory";
-import { EmptyToolRegistry } from "../../adapters/tools/EmptyToolRegistry";
+import { MathTool } from "../../adapters/tools/MathTool";
 import { loadAgentConfig } from "../../config/config";
 import { Agent } from "../../core/agent/Agent";
 import { ConversationManager } from "../../core/conversations/ConversationManager";
+import { ToolRegistry } from "../../core/tools/ToolRegistry";
 import { ensureCliAuth } from "./auth";
 
 export async function composeCliAgent(
@@ -42,7 +43,7 @@ export async function composeCliAgent(
   const transport = new CodexResponsesTransport({
     getAccessToken: () => auth.getAccessToken(),
   });
-  const tools = new EmptyToolRegistry();
+  const tools = new ToolRegistry([new MathTool()]);
   const memory = new ConversationMemory(conversations);
   return {
     config,

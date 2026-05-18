@@ -4,13 +4,13 @@ import { join } from "node:path";
 
 import { JsonlConversationStore } from "../../../src/adapters/file-system/JsonlConversationStore";
 import { ConversationMemory } from "../../../src/adapters/memory/conversation/ConversationMemory";
-import { EmptyToolRegistry } from "../../../src/adapters/tools/EmptyToolRegistry";
 import { Agent } from "../../../src/core/agent/Agent";
 import { ConversationManager } from "../../../src/core/conversations/ConversationManager";
 import type {
   ResponsesRequest,
   ResponsesStreamEvent,
 } from "../../../src/core/responses/ResponsesTransport.interface";
+import { ToolRegistry } from "../../../src/core/tools/ToolRegistry";
 
 class ScriptedTransport {
   readonly requests: ResponsesRequest[] = [];
@@ -62,7 +62,7 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
   const agent = new Agent({
     memory,
     transport,
-    tools: new EmptyToolRegistry(),
+    tools: new ToolRegistry([]),
   });
 
   const observed = [];
@@ -130,7 +130,7 @@ test("agent turn yields streaming text before the transport finishes", async () 
   const agent = new Agent({
     memory,
     transport,
-    tools: new EmptyToolRegistry(),
+    tools: new ToolRegistry([]),
   });
 
   const iterator = agent.runTurn({

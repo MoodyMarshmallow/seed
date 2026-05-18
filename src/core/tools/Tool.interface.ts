@@ -18,13 +18,13 @@ export interface ToolCallResult {
 }
 
 /**
- * Lists available tools and executes tool calls.
+ * One executable capability exposed to the model.
  */
-export interface ToolRegistry {
+export interface Tool {
   /**
-   * Returns the tool definitions exposed to the next model pass.
+   * Describes the tool and its expected input.
    */
-  readonly list: () => Promise<readonly ToolDefinition[]>;
+  readonly definition: ToolDefinition;
 
   /**
    * Executes one tool call.
