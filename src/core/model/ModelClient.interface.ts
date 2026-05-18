@@ -1,20 +1,20 @@
 import type { ResponseSettings } from "../conversations/entries";
 import type { ToolDefinition } from "../tools/Tool.interface";
 
-export interface ResponsesMessageInput {
+export interface ModelMessageInput {
   readonly role: "user" | "assistant" | "tool_result";
   readonly content: string;
   readonly callId?: string | undefined;
 }
 
-export interface ResponsesRequest {
+export interface ModelRequest {
   readonly systemPrompt: string;
   readonly settings: ResponseSettings;
-  readonly messages: readonly ResponsesMessageInput[];
+  readonly messages: readonly ModelMessageInput[];
   readonly tools: readonly ToolDefinition[];
 }
 
-export type ResponsesStreamEvent =
+export type ModelStreamEvent =
   | {
       readonly type: "text.delta";
       readonly delta: string;
@@ -38,12 +38,10 @@ export type ResponsesStreamEvent =
 /**
  * Streams normalized model response events.
  */
-export interface ResponsesTransport {
+export interface ModelClient {
   /**
    * Starts a response for the supplied context and tools.
    * Events must be yielded in model order with one terminal event.
    */
-  readonly stream: (
-    request: ResponsesRequest,
-  ) => AsyncIterable<ResponsesStreamEvent>;
+  readonly stream: (request: ModelRequest) => AsyncIterable<ModelStreamEvent>;
 }

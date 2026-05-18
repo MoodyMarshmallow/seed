@@ -5,7 +5,7 @@
 ## Domain Terms
 
 - **Agent**: The core orchestrator that runs turns through injected interfaces.
-- **Interface**: A stable replaceable contract, such as memory, token storage, model transport, or tool execution.
+- **Interface**: A stable replaceable contract, such as memory, token storage, model client, or tool execution.
 - **Adapter**: A concrete implementation of an interface shipped for local template use.
 - **Feature module**: Runtime behavior or orchestration code, such as the Agent, ConversationManager, config loader, or CLI harness.
 - **Conversation**: A user-facing chat history that can be resumed, displayed, and extended.
@@ -16,4 +16,4 @@
 
 ## Architectural Intent
 
-Keep the core library modular and dependency-injected. Concrete file stores and Codex transport exist to make the template runnable, but downstream projects should be able to replace them without changing agent orchestration.
+Keep the core library modular and dependency-injected. Concrete file stores and the Codex model client exist to make the template runnable, but downstream projects should be able to replace them without changing agent orchestration.

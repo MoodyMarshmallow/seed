@@ -2,7 +2,7 @@ import { join } from "node:path";
 
 import { CodexAuthClient } from "../../adapters/codex/auth/CodexAuthClient";
 import { CodexOAuthFlow } from "../../adapters/codex/auth/CodexOAuthFlow";
-import { CodexResponsesTransport } from "../../adapters/codex/responses/CodexResponsesTransport";
+import { CodexModelClient } from "../../adapters/codex/responses/CodexModelClient";
 import { JsonFileTokenStore } from "../../adapters/file-system/JsonFileTokenStore";
 import { JsonlConversationStore } from "../../adapters/file-system/JsonlConversationStore";
 import { ConversationMemory } from "../../adapters/memory/conversation/ConversationMemory";
@@ -40,7 +40,7 @@ export async function composeCliAgent(
     headless: options.headlessAuth ?? false,
     output: (line) => process.stdout.write(`${line}\n`),
   });
-  const transport = new CodexResponsesTransport({
+  const model = new CodexModelClient({
     getAccessToken: () => auth.getAccessToken(),
   });
   const tools = new ToolRegistry([new MathTool()]);
@@ -49,6 +49,6 @@ export async function composeCliAgent(
     config,
     conversations,
     memory,
-    agent: new Agent({ memory, transport, tools }),
+    agent: new Agent({ memory, model, tools }),
   };
 }

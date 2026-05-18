@@ -25,7 +25,7 @@ interface CodexAuthClientOptions {
   readonly fetch?: (input: string, init?: RequestInit) => Promise<Response>;
 }
 
-/** Reads local subscription auth and refreshes access tokens lazily before transport calls. */
+/** Reads local subscription auth and refreshes access tokens lazily before model calls. */
 export class CodexAuthClient {
   readonly #tokenStore: TokenStore;
   readonly #fetch: (input: string, init?: RequestInit) => Promise<Response>;

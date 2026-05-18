@@ -7,18 +7,16 @@ import { ConversationMemory } from "../../../src/adapters/memory/conversation/Co
 import { Agent } from "../../../src/core/agent/Agent";
 import { ConversationManager } from "../../../src/core/conversations/ConversationManager";
 import type {
-  ResponsesRequest,
-  ResponsesStreamEvent,
-} from "../../../src/core/responses/ResponsesTransport.interface";
+  ModelRequest,
+  ModelStreamEvent,
+} from "../../../src/core/model/ModelClient.interface";
 import { ToolRegistry } from "../../../src/core/tools/ToolRegistry";
 
-class ScriptedTransport {
-  readonly requests: ResponsesRequest[] = [];
+class ScriptedModelClient {
+  readonly requests: ModelRequest[] = [];
   #turn = 0;
 
-  async *stream(
-    request: ResponsesRequest,
-  ): AsyncGenerator<ResponsesStreamEvent> {
+  async *stream(request: ModelRequest): AsyncGenerator<ModelStreamEvent> {
     this.requests.push(request);
     this.#turn += 1;
     if (this.#turn === 1) {
@@ -57,11 +55,11 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
     reasoning: { effort: "medium", summary: "auto" },
     responseOverrides: {},
   });
-  const transport = new ScriptedTransport();
+  const model = new ScriptedModelClient();
   const memory = new ConversationMemory(conversations);
   const agent = new Agent({
     memory,
-    transport,
+    model,
     tools: new ToolRegistry([]),
   });
 
@@ -83,8 +81,8 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
     "text.delta",
     "completed",
   ]);
-  expect(transport.requests).toHaveLength(2);
-  expect(transport.requests[1]?.messages.at(-1)).toMatchObject({
+  expect(model.requests).toHaveLength(2);
+  expect(model.requests[1]?.messages.at(-1)).toMatchObject({
     role: "tool_result",
     callId: "call_1",
   });
@@ -101,7 +99,7 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
   ]);
 });
 
-test("agent turn yields streaming text before the transport finishes", async () => {
+test("agent turn yields streaming text before the model finishes", async () => {
   const cwd = await mkdtemp(join(tmpdir(), "agent-streaming-"));
   const conversations = new ConversationManager({
     cwd,
@@ -115,21 +113,21 @@ test("agent turn yields streaming text before the transport finishes", async () 
     reasoning: { effort: "medium", summary: "auto" },
     responseOverrides: {},
   });
-  let releaseTransport: () => void = () => undefined;
-  const transportGate = new Promise<void>((resolve) => {
-    releaseTransport = resolve;
+  let releaseModel: () => void = () => undefined;
+  const modelGate = new Promise<void>((resolve) => {
+    releaseModel = resolve;
   });
-  const transport = {
-    async *stream(): AsyncGenerator<ResponsesStreamEvent> {
+  const model = {
+    async *stream(): AsyncGenerator<ModelStreamEvent> {
       yield { type: "text.delta", delta: "streamed", raw: {} };
-      await transportGate;
+      await modelGate;
       yield { type: "completed", raw: {} };
     },
   };
   const memory = new ConversationMemory(conversations);
   const agent = new Agent({
     memory,
-    transport,
+    model,
     tools: new ToolRegistry([]),
   });
 
@@ -144,7 +142,7 @@ test("agent turn yields streaming text before the transport finishes", async () 
     value: { type: "text.delta", delta: "streamed" },
   });
 
-  releaseTransport();
+  releaseModel();
   await expect(iterator.next()).resolves.toEqual({
     done: false,
     value: { type: "completed" },

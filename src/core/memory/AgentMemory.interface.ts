@@ -1,11 +1,11 @@
 import type { ResponseSettings } from "../conversations/entries";
-import type { ResponsesMessageInput } from "../responses/ResponsesTransport.interface";
+import type { ModelMessageInput } from "../model/ModelClient.interface";
 import type { ToolCallRequest, ToolCallResult } from "../tools/Tool.interface";
 
 interface PreparedTurn {
   readonly systemPrompt: string;
   readonly settings: ResponseSettings;
-  readonly messages: readonly ResponsesMessageInput[];
+  readonly messages: readonly ModelMessageInput[];
 }
 
 export type AssistantContentBlock =

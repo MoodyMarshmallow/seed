@@ -1,4 +1,4 @@
-import { CodexResponsesTransport } from "../../../../src/adapters/codex/responses/CodexResponsesTransport";
+import { CodexModelClient } from "../../../../src/adapters/codex/responses/CodexModelClient";
 
 function sseStream(events: readonly unknown[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
@@ -14,13 +14,13 @@ function sseStream(events: readonly unknown[]): ReadableStream<Uint8Array> {
   });
 }
 
-test("Codex responses transport streams text, reasoning summaries, tool calls, and completion", async () => {
+test("Codex model client streams text, reasoning summaries, tool calls, and completion", async () => {
   const requests: Array<{
     readonly url: string;
     readonly body: unknown;
     readonly authorization: string | null;
   }> = [];
-  const transport = new CodexResponsesTransport({
+  const model = new CodexModelClient({
     getAccessToken: async () => "access-token",
     fetch: async (input, init) => {
       requests.push({
@@ -52,7 +52,7 @@ test("Codex responses transport streams text, reasoning summaries, tool calls, a
   });
 
   const events = [];
-  for await (const event of transport.stream({
+  for await (const event of model.stream({
     systemPrompt: "Be useful.",
     settings: {
       model: "gpt-5.1",
@@ -100,14 +100,14 @@ test("Codex responses transport streams text, reasoning summaries, tool calls, a
   ]);
 });
 
-test("Codex responses transport includes response error details when the backend rejects a request", async () => {
-  const transport = new CodexResponsesTransport({
+test("Codex model client includes response error details when the backend rejects a request", async () => {
+  const model = new CodexModelClient({
     getAccessToken: async () => "access-token",
     fetch: async () => new Response("bad request detail", { status: 400 }),
   });
 
   await expect(async () => {
-    for await (const _event of transport.stream({
+    for await (const _event of model.stream({
       systemPrompt: "Be useful.",
       settings: {
         model: "gpt-5.5",

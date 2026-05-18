@@ -2,14 +2,14 @@ import type {
   AgentMemory,
   AssistantContentBlock,
 } from "../memory/AgentMemory.interface";
-import type { ResponsesTransport } from "../responses/ResponsesTransport.interface";
+import type { ModelClient } from "../model/ModelClient.interface";
 import type { ToolCallRequest } from "../tools/Tool.interface";
 import type { ToolRegistry } from "../tools/ToolRegistry";
 import type { AgentTurnEvent } from "./events";
 
 export interface AgentDependencies {
   readonly memory: AgentMemory;
-  readonly transport: ResponsesTransport;
+  readonly model: ModelClient;
   readonly tools: ToolRegistry;
 }
 
@@ -22,15 +22,15 @@ interface AssistantPassResult {
   readonly toolCalls: ToolCallRequest[];
 }
 
-/** Core agent orchestrator. It depends on Memory, model transport, and tools. */
+/** Core agent orchestrator. It depends on Memory, model client, and tools. */
 export class Agent {
   readonly #memory: AgentMemory;
-  readonly #transport: ResponsesTransport;
+  readonly #model: ModelClient;
   readonly #tools: ToolRegistry;
 
   constructor(dependencies: AgentDependencies) {
     this.#memory = dependencies.memory;
-    this.#transport = dependencies.transport;
+    this.#model = dependencies.model;
     this.#tools = dependencies.tools;
   }
 
@@ -71,7 +71,7 @@ export class Agent {
     const tools = await this.#tools.list();
     const content: AssistantContentBlock[] = [];
 
-    for await (const event of this.#transport.stream({
+    for await (const event of this.#model.stream({
       systemPrompt: context.systemPrompt,
       settings: context.settings,
       messages: context.messages,

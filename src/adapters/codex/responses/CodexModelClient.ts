@@ -1,33 +1,31 @@
 import { AgentError } from "../../../core/errors/AgentError";
 import type {
-  ResponsesRequest,
-  ResponsesStreamEvent,
-  ResponsesTransport,
-} from "../../../core/responses/ResponsesTransport.interface";
+  ModelClient,
+  ModelRequest,
+  ModelStreamEvent,
+} from "../../../core/model/ModelClient.interface";
 import { mapResponsesEvent, parseSseMessages } from "./responsesEvents";
 import { buildCodexResponsesBody } from "./responsesRequest";
 
 const CODEX_RESPONSES_ENDPOINT =
   "https://chatgpt.com/backend-api/codex/responses";
 
-interface CodexResponsesTransportOptions {
+interface CodexModelClientOptions {
   readonly getAccessToken: () => Promise<string>;
   readonly fetch?: (input: string, init?: RequestInit) => Promise<Response>;
 }
 
-/** Direct streaming transport for the Codex subscription Responses endpoint. */
-export class CodexResponsesTransport implements ResponsesTransport {
+/** Direct model client for the Codex subscription Responses endpoint. */
+export class CodexModelClient implements ModelClient {
   readonly #getAccessToken: () => Promise<string>;
   readonly #fetch: (input: string, init?: RequestInit) => Promise<Response>;
 
-  constructor(options: CodexResponsesTransportOptions) {
+  constructor(options: CodexModelClientOptions) {
     this.#getAccessToken = options.getAccessToken;
     this.#fetch = options.fetch ?? fetch;
   }
 
-  async *stream(
-    request: ResponsesRequest,
-  ): AsyncGenerator<ResponsesStreamEvent> {
+  async *stream(request: ModelRequest): AsyncGenerator<ModelStreamEvent> {
     const accessToken = await this.#getAccessToken();
     const response = await this.#fetch(CODEX_RESPONSES_ENDPOINT, {
       method: "POST",

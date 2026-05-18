@@ -8,7 +8,7 @@ import type {
   AssistantContentBlock,
   MemoryRecord,
 } from "../../../core/memory/AgentMemory.interface";
-import type { ResponsesMessageInput } from "../../../core/responses/ResponsesTransport.interface";
+import type { ModelMessageInput } from "../../../core/model/ModelClient.interface";
 
 /** Adapts linear conversations to the Agent Memory seam. */
 export class ConversationMemory implements AgentMemory {
@@ -61,9 +61,7 @@ export class ConversationMemory implements AgentMemory {
   }
 }
 
-function toResponsesMessage(
-  message: ConversationMessage,
-): ResponsesMessageInput {
+function toResponsesMessage(message: ConversationMessage): ModelMessageInput {
   const callId =
     message.role === "tool_result" &&
     typeof message.raw === "object" &&

@@ -2,12 +2,12 @@
 
 ## Project Introduction
 
-`seed` is a minimal Bun/TypeScript coding-agent template. It is intended to be copied into new projects and adapted quickly, while keeping the core Agent independent from concrete storage, auth, model transport, tool, and CLI decisions.
+`seed` is a minimal Bun/TypeScript coding-agent template. It is intended to be copied into new projects and adapted quickly, while keeping the core Agent independent from concrete storage, auth, model client, tool, and CLI decisions.
 
 ## Main Objectives
 
 - Keep the codebase minimal: add the smallest correct module or interface that solves the current need.
-- Keep the codebase extensible: make future Memory, transport, auth, and tool adapters easy to add without rewriting the Agent.
+- Keep the codebase extensible: make future Memory, model client, auth, and tool adapters easy to add without rewriting the Agent.
 - Prefer deep modules: put meaningful behavior behind small interfaces, and avoid shallow pass-through helpers.
 - Maintain clear seams: `*.interface.ts` files define stable interfaces; adapters provide concrete implementations; feature modules provide runtime behavior and orchestration.
 - Preserve full test coverage for behavior that defines a seam, adapter, or user-visible flow.

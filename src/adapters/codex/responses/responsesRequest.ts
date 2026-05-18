@@ -1,7 +1,7 @@
-import type { ResponsesRequest } from "../../../core/responses/ResponsesTransport.interface";
+import type { ModelRequest } from "../../../core/model/ModelClient.interface";
 
 export function buildCodexResponsesBody(
-  request: ResponsesRequest,
+  request: ModelRequest,
 ): Record<string, unknown> {
   return {
     ...request.settings.responseOverrides,

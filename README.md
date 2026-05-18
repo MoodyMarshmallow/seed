@@ -55,16 +55,16 @@ Core code depends on explicit interfaces instead of constructing defaults intern
 - `AgentMemory.interface.ts` prepares model context and records conversation events.
 - `ConversationStore.interface.ts` persists complete conversation records.
 - `TokenStore.interface.ts` persists local Codex subscription tokens.
-- `ResponsesTransport.interface.ts` streams normalized Responses events.
-- `ToolRegistry.interface.ts` lists and executes tools.
+- `ModelClient.interface.ts` streams normalized model events.
+- `ToolRegistry` lists and executes tools.
 
 Concrete adapters are replaceable:
 
 - `JsonlConversationStore` writes JSONL conversation files.
 - `ConversationMemory` adapts linear conversation storage to `AgentMemory`.
 - `JsonFileTokenStore` writes project-local auth JSON.
-- `CodexResponsesTransport` calls the internal Codex Responses endpoint with injected `fetch`.
-- `EmptyToolRegistry` exposes no tools and returns structured unavailable-tool results.
+- `CodexModelClient` calls the internal Codex Responses endpoint with injected `fetch`.
+- `MathTool` demonstrates a concrete tool adapter.
 
 The intended dependency rule is:
 
@@ -96,7 +96,7 @@ Compaction and pruning are not implemented yet, but the store replaces complete 
 
 ## Reasoning And Outputs
 
-The transport normalizes streaming Responses events into text deltas, reasoning-summary deltas, tool calls, completion, and failure events.
+The model client normalizes streaming provider events into text deltas, reasoning-summary deltas, tool calls, completion, and failure events.
 
 Reasoning summaries are displayed and persisted as explicit summary blocks. Raw reasoning is not replayed into future model context.
 
@@ -113,7 +113,7 @@ The CLI supports:
 - `/resume`
 - `/exit`
 
-The CLI is not intended as the downstream product interface. It composes the file stores, conversation memory adapter, Codex auth client, Codex transport, empty tools, and `Agent` to prove the system works end-to-end.
+The CLI is not intended as the downstream product interface. It composes the file stores, conversation memory adapter, Codex auth client, Codex model client, tools, and `Agent` to prove the system works end-to-end.
 
 ## Testing
 
@@ -121,7 +121,7 @@ The test suite uses Vitest and covers:
 
 - Config validation.
 - JSONL conversation initial context and context building.
-- Tree-backed Memory projection into model input.
+- Conversation-backed Memory projection into model input.
 - File token persistence and lazy refresh.
 - Streaming Responses parsing and request construction.
 - Library-level agent turns with missing tool-call recovery.
