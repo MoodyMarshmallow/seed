@@ -7,7 +7,7 @@ import type { ToolCallRequest } from "../tools/Tool.interface";
 import type { ToolRegistry } from "../tools/ToolRegistry";
 import type { AgentTurnEvent } from "./events";
 
-export interface AgentOptions {
+export interface AgentDependencies {
   readonly memory: AgentMemory;
   readonly transport: ResponsesTransport;
   readonly tools: ToolRegistry;
@@ -28,10 +28,10 @@ export class Agent {
   readonly #transport: ResponsesTransport;
   readonly #tools: ToolRegistry;
 
-  constructor(options: AgentOptions) {
-    this.#memory = options.memory;
-    this.#transport = options.transport;
-    this.#tools = options.tools;
+  constructor(dependencies: AgentDependencies) {
+    this.#memory = dependencies.memory;
+    this.#transport = dependencies.transport;
+    this.#tools = dependencies.tools;
   }
 
   async *runTurn(input: RunTurnInput): AsyncGenerator<AgentTurnEvent> {
