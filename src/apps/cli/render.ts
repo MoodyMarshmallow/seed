@@ -1,30 +1,40 @@
 import type { AgentTurnEvent } from "../../core/agent/events";
 
 export class CliTurnRenderer {
-  #inTextBlock = false;
+  #inlineBlock: "reasoning" | "text" | null = null;
 
   /** Renders streaming text inline while keeping metadata events readable. */
   render(event: AgentTurnEvent): string {
     switch (event.type) {
       case "reasoning_summary.delta":
-        return `${this.#breakTextBlock()}[reasoning] ${event.delta}\n`;
+        return this.#renderInlineDelta("reasoning", event.delta);
       case "text.delta":
-        this.#inTextBlock = true;
-        return event.delta;
+        return this.#renderInlineDelta("text", event.delta);
       case "tool_call":
-        return `${this.#breakTextBlock()}[tool call] ${event.name} ${event.callId}\n`;
+        return `${this.#breakInlineBlock()}[tool call] ${event.name} ${event.callId}\n`;
       case "tool_result":
-        return `${this.#breakTextBlock()}[tool result] ${event.isError ? "error" : "ok"}: ${event.output}\n`;
+        return `${this.#breakInlineBlock()}[tool result] ${event.isError ? "error" : "ok"}: ${event.output}\n`;
       case "completed":
-        return this.#breakTextBlock();
+        return this.#breakInlineBlock();
     }
   }
 
-  #breakTextBlock(): string {
-    if (!this.#inTextBlock) {
+  #renderInlineDelta(block: "reasoning" | "text", delta: string): string {
+    if (this.#inlineBlock === block) {
+      return delta;
+    }
+
+    const prefix = block === "reasoning" ? "[reasoning] " : "";
+    const leadingBreak = this.#breakInlineBlock();
+    this.#inlineBlock = block;
+    return `${leadingBreak}${prefix}${delta}`;
+  }
+
+  #breakInlineBlock(): string {
+    if (!this.#inlineBlock) {
       return "";
     }
-    this.#inTextBlock = false;
+    this.#inlineBlock = null;
     return "\n";
   }
 }
