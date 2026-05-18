@@ -1,144 +1,77 @@
 # Seed
 
-`Seed` is a minimal Bun/TypeScript agent template built around Codex subscription authentication and the ChatGPT Codex Responses endpoint.
+## Intro
 
-The library is the stable surface. The CLI is intentionally a thin development harness for end-to-end testing and local experimentation.
+`seed` is a minimal Bun/TypeScript coding-agent template. It provides a small core Agent with replaceable seams for memory, model clients, auth token storage, conversation storage, and tools.
+
+The included CLI is for demonstration and testing, not the product surface. It wires the core Agent to Codex subscription auth, the ChatGPT Codex Responses endpoint, JSONL conversation storage, and a small example math tool so the template can run end-to-end locally.
 
 ## Quickstart
 
 ```bash
 bun install
-bun run test
-bun run typecheck
 bun run agent
 ```
 
-The CLI stores local development state under `.agent/`, which is gitignored:
+On first run, the CLI starts a Codex OAuth flow and stores local state in `.agent/`, which is gitignored.
 
-- `.agent/auth.json` for local Codex OAuth tokens.
-- `.agent/conversations/*.jsonl` for local conversation storage.
-
-If `.agent/auth.json` does not exist, `bun run agent` starts the local OAuth flow before opening the chat. Use `bun run agent --headless-auth` to print the authorization URL without opening a browser.
-
-## Configuration
-
-New conversations snapshot `agent.config.json` into their initial context:
-
-```json
-{
-  "systemPrompt": "You are a minimal coding agent.",
-  "model": "gpt-5.5",
-  "reasoning": {
-    "effort": "medium",
-    "summary": "auto"
-  },
-  "responseOverrides": {}
-}
-```
-
-Known fields provide ergonomics. `responseOverrides` is the escape hatch for arbitrary Responses API parameters.
-
-## Architecture
-
-The source tree is organized by seam ownership:
-
-```text
-src/
-  core/           Framework-neutral orchestration, contracts, and memory model
-  adapters/       Replaceable Codex, filesystem, and tool implementations
-  config/         Version-controlled project config loading and validation
-  apps/cli/       Thin runnable harness that composes core + adapters
-```
-
-Core code depends on explicit interfaces instead of constructing defaults internally:
-
-- `AgentMemory.interface.ts` prepares model context and records conversation events.
-- `ConversationStore.interface.ts` persists complete conversation records.
-- `TokenStore.interface.ts` persists local Codex subscription tokens.
-- `ModelClient.interface.ts` streams normalized model events.
-- `ToolRegistry` lists and executes tools.
-
-Concrete adapters are replaceable:
-
-- `JsonlConversationStore` writes JSONL conversation files.
-- `ConversationMemory` adapts linear conversation storage to `AgentMemory`.
-- `JsonFileTokenStore` writes project-local auth JSON.
-- `CodexModelClient` calls the internal Codex Responses endpoint with injected `fetch`.
-- `MathTool` demonstrates a concrete tool adapter.
-
-The intended dependency rule is:
-
-```text
-core/*        -> core/* only
-adapters/*    -> core/* only
-config/*      -> core/* allowed
-apps/cli/*    -> core/* + adapters/* + config/*
-```
-
-There are no barrel files. Direct imports are preferred so the seam being used is visible at each call site.
-
-File roles are named explicitly:
-
-- `*.interface.ts` files contain replaceable contracts only.
-- `src/adapters/**` files contain concrete implementations of interfaces.
-- Other source files are feature modules that implement runtime behavior, orchestration, parsing, or composition.
-
-## Conversations
-
-Conversations are currently stored as versioned JSONL records. New conversations start with initial context:
-
-1. system prompt
-2. latest model settings
-
-Conversations are linear, turn-based chats between one user and one agent. A turn starts with a user message, may include tool interactions, and completes with an assistant message. Latest model settings live on the conversation and are not part of undo history.
-
-Compaction and pruning are not implemented yet, but the store replaces complete conversation records so future cleanup can remove unused turns without changing the manager-facing interface.
-
-## Reasoning And Outputs
-
-The model client normalizes streaming provider events into text deltas, reasoning-summary deltas, tool calls, completion, and failure events.
-
-Reasoning summaries are displayed and persisted as explicit summary blocks. Raw reasoning is not replayed into future model context.
-
-## CLI Harness
-
-The CLI supports:
-
-- browser OAuth when no local token exists
-- `--headless-auth` for URL-only OAuth
-- `/model <model>`
-- `/reasoning <effort>`
-- `/set-json <json>`
-- `/new`
-- `/resume`
-- `/exit`
-
-The CLI is not intended as the downstream product interface. It composes the file stores, conversation memory adapter, Codex auth client, Codex model client, tools, and `Agent` to prove the system works end-to-end.
-
-## Testing
-
-The test suite uses Vitest and covers:
-
-- Config validation.
-- JSONL conversation initial context and context building.
-- Conversation-backed Memory projection into model input.
-- File token persistence and lazy refresh.
-- Streaming Responses parsing and request construction.
-- Library-level agent turns with missing tool-call recovery.
-- CLI command parsing and one process-level smoke test.
-
-Tests are grouped by ownership:
-
-- `tests/core/` for core Agent and conversation modules.
-- `tests/adapters/` for concrete Codex, filesystem, Memory, and tool adapters.
-- `tests/apps/cli/` for the CLI harness.
-- `tests/config/` for config loading and validation.
-
-Run all checks before using the template as a base:
+Useful commands:
 
 ```bash
+bun run agent --headless-auth
 bun run lint
 bun run typecheck
 bun run test
 bun run knip
 ```
+
+## Architecture
+
+The architecture has two layers: core code that defines agent behavior, and extensible code that supplies concrete runtime choices.
+
+### Core
+
+```text
+src/core/
+  agent/          Turn orchestration
+  conversations/  Linear conversation lifecycle and replay context
+  memory/         Agent-facing memory interface
+  model/          Model-client interface
+  auth/           Token-store interface
+  tools/          Tool interface and registry
+  errors/         Shared agent errors
+```
+
+Core owns:
+
+- `Agent`, which records user messages, streams model output, executes tools, records tool results, and performs one recovery pass.
+- `ConversationManager`, which creates/resumes conversations, records messages, updates settings, undoes turns, and builds replay context.
+- `ToolRegistry`, which lists registered tool definitions and dispatches tool calls by exact name.
+
+Interfaces that extend the core are:
+
+- `AgentMemory.interface.ts` for preparing model context and recording conversation events.
+- `ModelClient.interface.ts` for streaming normalized model events.
+- `ConversationStore.interface.ts` for persisting complete conversation records.
+- `TokenStore.interface.ts` for local auth token persistence.
+- `Tool.interface.ts` for executable model tools.
+
+### Extensible Parts
+
+```text
+src/
+  adapters/       Codex, filesystem, memory, and tool implementations
+  config/         Project config loading and validation
+  apps/cli/       Thin runnable harness that composes core + adapters
+```
+
+Included extensible implementations are:
+
+- `SimpleLinearMemory` is a placeholder `AgentMemory` implementation backed by one linear conversation timeline.
+- `JsonlConversationStore` stores conversations as JSONL records.
+- `JsonFileTokenStore` stores local Codex auth tokens.
+- `CodexModelClient` calls the Codex Responses endpoint.
+- `CodexAuthClient` refreshes and exchanges Codex tokens.
+- `MathTool` demonstrates adding a concrete tool.
+
+The CLI is also replaceable. It composes config, auth, storage, memory, model client, tools, and `Agent` so the template can be demonstrated and tested end-to-end.
