@@ -4,7 +4,10 @@ import type {
   ModelRequest,
   ModelStreamEvent,
 } from "../../../core/model/ModelClient.interface";
-import { mapResponsesEvent, parseSseMessages } from "./responsesEvents";
+import {
+  mapCodexResponsesEvent,
+  parseSseDataMessages,
+} from "./responsesEvents";
 import { buildCodexResponsesBody } from "./responsesRequest";
 
 const CODEX_RESPONSES_ENDPOINT =
@@ -27,7 +30,7 @@ export class CodexModelClient implements ModelClient {
 
   async *stream(request: ModelRequest): AsyncGenerator<ModelStreamEvent> {
     const accessToken = await this.#getAccessToken();
-    const response = await this.#fetch(CODEX_RESPONSES_ENDPOINT, {
+    const httpResponse = await this.#fetch(CODEX_RESPONSES_ENDPOINT, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -36,26 +39,26 @@ export class CodexModelClient implements ModelClient {
       body: JSON.stringify(buildCodexResponsesBody(request)),
     });
 
-    if (!response.ok) {
-      const detail = await response.text().catch(() => "");
+    if (!httpResponse.ok) {
+      const errorBody = await httpResponse.text().catch(() => "");
       throw new AgentError({
         code: "transport_failed",
-        message: `Codex Responses request failed with status ${response.status}.${detail ? ` ${detail}` : ""}`,
-        retryable: response.status >= 500,
+        message: `Codex Responses request failed with status ${httpResponse.status}.${errorBody ? ` ${errorBody}` : ""}`,
+        retryable: httpResponse.status >= 500,
       });
     }
 
-    if (!response.body) {
+    if (!httpResponse.body) {
       throw new AgentError({
         code: "transport_failed",
         message: "Codex Responses request did not include a stream body.",
       });
     }
 
-    for await (const message of parseSseMessages(response.body)) {
-      const mapped = mapResponsesEvent(JSON.parse(message.data));
-      if (mapped) {
-        yield mapped;
+    for await (const sseMessage of parseSseDataMessages(httpResponse.body)) {
+      const modelEvent = mapCodexResponsesEvent(JSON.parse(sseMessage.data));
+      if (modelEvent) {
+        yield modelEvent;
       }
     }
   }

@@ -2,7 +2,7 @@ interface SseMessage {
   readonly data: string;
 }
 
-export async function* parseSseMessages(
+export async function* parseSseDataMessages(
   stream: ReadableStream<Uint8Array>,
 ): AsyncGenerator<SseMessage> {
   const reader = stream.getReader();
@@ -43,48 +43,55 @@ function parseToolArguments(value: unknown): unknown {
   }
 }
 
-export function mapResponsesEvent(raw: unknown) {
+export function mapCodexResponsesEvent(raw: unknown) {
   if (typeof raw !== "object" || raw === null || !("type" in raw)) {
     return null;
   }
-  const event = raw as Record<string, unknown>;
+  const codexEvent = raw as Record<string, unknown>;
 
   if (
-    event.type === "response.output_text.delta" &&
-    typeof event.delta === "string"
+    codexEvent.type === "response.output_text.delta" &&
+    typeof codexEvent.delta === "string"
   ) {
-    return { type: "text.delta" as const, delta: event.delta, raw };
+    return { type: "text.delta" as const, delta: codexEvent.delta, raw };
   }
   if (
-    (event.type === "response.reasoning_summary_text.delta" ||
-      event.type === "response.reasoning_summary.delta") &&
-    typeof event.delta === "string"
+    (codexEvent.type === "response.reasoning_summary_text.delta" ||
+      codexEvent.type === "response.reasoning_summary.delta") &&
+    typeof codexEvent.delta === "string"
   ) {
     return {
       type: "reasoning_summary.delta" as const,
-      delta: event.delta,
+      delta: codexEvent.delta,
       raw,
     };
   }
-  if (event.type === "response.output_item.done") {
-    const item = event.item as Record<string, unknown> | undefined;
-    if (item?.type === "function_call" && typeof item.name === "string") {
+  if (codexEvent.type === "response.output_item.done") {
+    const outputItem = codexEvent.item as Record<string, unknown> | undefined;
+    if (
+      outputItem?.type === "function_call" &&
+      typeof outputItem.name === "string"
+    ) {
       return {
         type: "tool_call" as const,
-        callId: typeof item.call_id === "string" ? item.call_id : "",
-        name: item.name,
-        input: parseToolArguments(item.arguments),
+        callId:
+          typeof outputItem.call_id === "string" ? outputItem.call_id : "",
+        name: outputItem.name,
+        input: parseToolArguments(outputItem.arguments),
         raw,
       };
     }
   }
-  if (event.type === "response.completed") {
+  if (codexEvent.type === "response.completed") {
     return { type: "completed" as const, raw };
   }
-  if (event.type === "response.failed") {
+  if (codexEvent.type === "response.failed") {
     return {
       type: "failed" as const,
-      error: typeof event.error === "string" ? event.error : "Response failed.",
+      error:
+        typeof codexEvent.error === "string"
+          ? codexEvent.error
+          : "Response failed.",
       raw,
     };
   }
