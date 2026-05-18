@@ -16,3 +16,13 @@ export const agentConfigSchema = z.object({
 
 export type ReasoningSettings = z.infer<typeof reasoningSettingsSchema>;
 export type AgentConfig = z.infer<typeof agentConfigSchema>;
+
+/**
+ * Loads initial Agent defaults from a concrete configuration source.
+ */
+export interface AgentConfigStore {
+  /**
+   * Returns validated initial Agent defaults.
+   */
+  readonly load: () => Promise<AgentConfig>;
+}

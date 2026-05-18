@@ -1,4 +1,4 @@
-import type { AgentConfig } from "../../config/schema";
+import type { AgentConfig } from "../../core/config/AgentConfigStore.interface";
 import type {
   ConversationManager,
   CreatedConversation,

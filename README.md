@@ -2,9 +2,9 @@
 
 ## Intro
 
-`seed` is a minimal Bun/TypeScript coding-agent template. It provides a small core Agent with replaceable seams for memory, model clients, auth token storage, conversation storage, and tools.
+`seed` is a minimal Bun/TypeScript coding-agent template. It provides a small core Agent with replaceable seams for config, memory, model clients, auth token storage, conversation storage, and tools.
 
-There is an included CLI for demonstration and testing purpoposes. It wires the core Agent to Codex subscription auth, the OpenAI Responses API, JSONL conversation storage, and a small example math tool so the template can run end-to-end locally.
+There is an included CLI for demonstration and testing purposes. It wires the core Agent to Codex subscription auth, the OpenAI Responses API, JSONL conversation storage, and a small example math tool so the template can run end-to-end locally.
 
 ## Quickstart
 
@@ -35,6 +35,7 @@ The architecture has two layers: core code that defines agent behavior, and exte
 src/core/
   agent/          Turn orchestration
   conversations/  Linear conversation lifecycle and replay context
+  config/         Agent config interface and schema
   memory/         Agent-facing memory interface
   model/          Model-client interface
   auth/           Token-store interface
@@ -51,6 +52,7 @@ Core owns:
 Interfaces that extend the core are:
 
 - `AgentMemory.interface.ts` for preparing model context and recording conversation events.
+- `AgentConfigStore.interface.ts` for loading initial Agent defaults.
 - `ModelClient.interface.ts` for streaming normalized model events.
 - `ConversationStore.interface.ts` for persisting complete conversation records.
 - `TokenStore.interface.ts` for local auth token persistence.
@@ -61,13 +63,13 @@ Interfaces that extend the core are:
 ```text
 src/
   adapters/       Codex, filesystem, memory, and tool implementations
-  config/         Project config loading and validation
   apps/cli/       Thin runnable harness that composes core + adapters
 ```
 
 Included extensible implementations are:
 
 - `SimpleLinearMemory` is a placeholder `AgentMemory` implementation backed by one linear conversation timeline.
+- `JsonAgentConfigStore` loads and validates `agent.config.json`.
 - `JsonlConversationStore` stores conversations as JSONL records.
 - `JsonFileTokenStore` stores local Codex auth tokens.
 - `CodexModelClient` calls the Codex Responses endpoint.

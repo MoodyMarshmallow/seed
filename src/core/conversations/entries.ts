@@ -1,4 +1,4 @@
-import type { ReasoningSettings } from "../../config/schema";
+import type { ReasoningSettings } from "../config/AgentConfigStore.interface";
 
 export const CONVERSATION_SCHEMA_VERSION = 1;
 

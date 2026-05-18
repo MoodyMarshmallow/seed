@@ -3,7 +3,7 @@ import {
   resolveConversationSelection,
   selectInitialConversation,
 } from "../../../src/apps/cli/conversationSelection";
-import type { AgentConfig } from "../../../src/config/schema";
+import type { AgentConfig } from "../../../src/core/config/AgentConfigStore.interface";
 
 const config: AgentConfig = {
   systemPrompt: "Be useful.",

@@ -3,11 +3,11 @@ import { join } from "node:path";
 import { CodexAuthClient } from "../../adapters/codex/auth/CodexAuthClient";
 import { CodexOAuthFlow } from "../../adapters/codex/auth/CodexOAuthFlow";
 import { CodexModelClient } from "../../adapters/codex/responses/CodexModelClient";
+import { JsonAgentConfigStore } from "../../adapters/file-system/JsonAgentConfigStore";
 import { JsonFileTokenStore } from "../../adapters/file-system/JsonFileTokenStore";
 import { JsonlConversationStore } from "../../adapters/file-system/JsonlConversationStore";
 import { SimpleLinearMemory } from "../../adapters/memory/simple-linear/SimpleLinearMemory";
 import { MathTool } from "../../adapters/tools/MathTool";
-import { loadAgentConfig } from "../../config/config";
 import { Agent } from "../../core/agent/Agent";
 import { ConversationManager } from "../../core/conversations/ConversationManager";
 import { ToolRegistry } from "../../core/tools/ToolRegistry";
@@ -17,7 +17,9 @@ export async function composeCliAgent(
   cwd: string,
   options: { readonly headlessAuth?: boolean } = {},
 ) {
-  const config = await loadAgentConfig(cwd);
+  const config = await new JsonAgentConfigStore({
+    filePath: join(cwd, "agent.config.json"),
+  }).load();
   const conversations = new ConversationManager({
     cwd,
     store: new JsonlConversationStore({
