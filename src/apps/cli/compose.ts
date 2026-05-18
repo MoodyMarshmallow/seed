@@ -4,12 +4,12 @@ import { CodexAuthClient } from "../../adapters/codex/auth/CodexAuthClient";
 import { CodexOAuthFlow } from "../../adapters/codex/auth/CodexOAuthFlow";
 import { CodexResponsesTransport } from "../../adapters/codex/responses/CodexResponsesTransport";
 import { JsonFileTokenStore } from "../../adapters/file-system/JsonFileTokenStore";
-import { JsonlSessionStore } from "../../adapters/file-system/JsonlSessionStore";
-import { TreeSessionMemory } from "../../adapters/memory/tree/TreeSessionMemory";
+import { JsonlConversationStore } from "../../adapters/file-system/JsonlConversationStore";
+import { ConversationMemory } from "../../adapters/memory/conversation/ConversationMemory";
 import { EmptyToolRegistry } from "../../adapters/tools/EmptyToolRegistry";
 import { loadAgentConfig } from "../../config/config";
 import { Agent } from "../../core/agent/Agent";
-import { SessionManager } from "../../core/sessions/SessionManager";
+import { ConversationManager } from "../../core/conversations/ConversationManager";
 import { ensureCliAuth } from "./auth";
 
 export async function composeCliAgent(
@@ -17,9 +17,11 @@ export async function composeCliAgent(
   options: { readonly headlessAuth?: boolean } = {},
 ) {
   const config = await loadAgentConfig(cwd);
-  const sessions = new SessionManager({
+  const conversations = new ConversationManager({
     cwd,
-    store: new JsonlSessionStore({ rootDir: join(cwd, ".agent", "sessions") }),
+    store: new JsonlConversationStore({
+      rootDir: join(cwd, ".agent", "conversations"),
+    }),
   });
   const tokenStore = new JsonFileTokenStore({
     filePath: join(cwd, ".agent", "auth.json"),
@@ -41,10 +43,10 @@ export async function composeCliAgent(
     getAccessToken: () => auth.getAccessToken(),
   });
   const tools = new EmptyToolRegistry();
-  const memory = new TreeSessionMemory(sessions);
+  const memory = new ConversationMemory(conversations);
   return {
     config,
-    sessions,
+    conversations,
     memory,
     agent: new Agent({ memory, transport, tools }),
   };

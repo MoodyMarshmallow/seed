@@ -1,5 +1,5 @@
+import type { ResponseSettings } from "../conversations/entries";
 import type { ResponsesMessageInput } from "../responses/ResponsesTransport.interface";
-import type { ResponseSettings } from "../sessions/entries";
 import type {
   ToolCallRequest,
   ToolCallResult,
@@ -40,9 +40,21 @@ export type MemoryRecord =
       readonly settings: ResponseSettings;
     };
 
+/**
+ * Prepares model context and records conversation events.
+ */
 export interface AgentMemory {
+  /**
+   * Returns the active settings and replayable messages for the conversation.
+   * Raw reasoning must not be included.
+   */
   readonly prepareTurn: (input: {
     readonly conversationId: string;
   }) => Promise<PreparedTurn>;
+
+  /**
+   * Appends one event to the conversation.
+   * Once resolved, the event must be visible to later `prepareTurn` calls.
+   */
   readonly record: (record: MemoryRecord) => Promise<void>;
 }

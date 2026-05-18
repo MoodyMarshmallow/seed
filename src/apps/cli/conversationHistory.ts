@@ -1,12 +1,12 @@
-import type { SessionManager } from "../../core/sessions/SessionManager";
-import type { MessageEntry } from "../../core/sessions/entries";
+import type { ConversationManager } from "../../core/conversations/ConversationManager";
+import type { ConversationMessage } from "../../core/conversations/entries";
 
 /** Renders the active branch history for a resumed conversation. */
 export async function renderConversationHistory(
-  sessions: Pick<SessionManager, "buildContext">,
+  conversations: Pick<ConversationManager, "buildContext">,
   conversationId: string,
 ): Promise<string> {
-  const context = await sessions.buildContext(conversationId);
+  const context = await conversations.buildContext(conversationId);
   if (context.messages.length === 0) {
     return "";
   }
@@ -14,7 +14,7 @@ export async function renderConversationHistory(
   return `\nPrevious conversation:\n${context.messages.map(renderMessage).join("\n\n")}\n\n`;
 }
 
-function renderMessage(message: MessageEntry): string {
+function renderMessage(message: ConversationMessage): string {
   const label =
     message.role === "user"
       ? "You"
@@ -25,7 +25,7 @@ function renderMessage(message: MessageEntry): string {
   return `${label}:\n${body}`;
 }
 
-function renderContentBlocks(content: MessageEntry["content"]): string {
+function renderContentBlocks(content: ConversationMessage["content"]): string {
   const lines: string[] = [];
   let textBuffer = "";
 
@@ -53,7 +53,9 @@ function renderContentBlocks(content: MessageEntry["content"]): string {
   return lines.join("\n");
 }
 
-function renderContentBlock(block: MessageEntry["content"][number]): string {
+function renderContentBlock(
+  block: ConversationMessage["content"][number],
+): string {
   if (block.type === "reasoning_summary") {
     return `[reasoning] ${block.text ?? ""}`;
   }

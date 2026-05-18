@@ -16,7 +16,7 @@ bun run agent
 The CLI stores local development state under `.agent/`, which is gitignored:
 
 - `.agent/auth.json` for local Codex OAuth tokens.
-- `.agent/sessions/*.jsonl` for append-only conversation storage.
+- `.agent/conversations/*.jsonl` for local conversation storage.
 
 If `.agent/auth.json` does not exist, `bun run agent` starts the local OAuth flow before opening the chat. Use `bun run agent --headless-auth` to print the authorization URL without opening a browser.
 
@@ -53,15 +53,15 @@ src/
 Core code depends on explicit interfaces instead of constructing defaults internally:
 
 - `AgentMemory.interface.ts` prepares model context and records conversation events.
-- `SessionStore.interface.ts` currently persists versioned conversation records.
+- `ConversationStore.interface.ts` persists complete conversation records.
 - `TokenStore.interface.ts` persists local Codex subscription tokens.
 - `ResponsesTransport.interface.ts` streams normalized Responses events.
 - `ToolRegistry.interface.ts` lists and executes tools.
 
 Concrete adapters are replaceable:
 
-- `JsonlSessionStore` writes append-only JSONL conversation files.
-- `TreeSessionMemory` adapts the current tree-shaped conversation storage to `AgentMemory`.
+- `JsonlConversationStore` writes JSONL conversation files.
+- `ConversationMemory` adapts linear conversation storage to `AgentMemory`.
 - `JsonFileTokenStore` writes project-local auth JSON.
 - `CodexResponsesTransport` calls the internal Codex Responses endpoint with injected `fetch`.
 - `EmptyToolRegistry` exposes no tools and returns structured unavailable-tool results.
@@ -85,14 +85,14 @@ File roles are named explicitly:
 
 ## Conversations
 
-Conversations are currently stored as versioned JSONL records. Every entry has an `id`, `parentId`, and timestamp. New conversations start with initial context:
+Conversations are currently stored as versioned JSONL records. New conversations start with initial context:
 
-1. `system_prompt`
-2. `settings`
+1. system prompt
+2. latest model settings
 
-User turns append descendants from the current leaf. Branch-local settings are represented as entries, so future navigation can diverge model, reasoning, or arbitrary Responses overrides per branch.
+Conversations are linear, turn-based chats between one user and one agent. A turn starts with a user message, may include tool interactions, and completes with an assistant message. Latest model settings live on the conversation and are not part of undo history.
 
-Compaction is not implemented yet, but the `compaction` entry contract exists so downstream projects can add summarization without changing the conversation storage format shape.
+Compaction and pruning are not implemented yet, but the store replaces complete conversation records so future cleanup can remove unused turns without changing the manager-facing interface.
 
 ## Reasoning And Outputs
 
@@ -113,7 +113,7 @@ The CLI supports:
 - `/resume`
 - `/exit`
 
-The CLI is not intended as the downstream product interface. It composes the file stores, tree-backed memory adapter, Codex auth client, Codex transport, empty tools, and `Agent` to prove the system works end-to-end.
+The CLI is not intended as the downstream product interface. It composes the file stores, conversation memory adapter, Codex auth client, Codex transport, empty tools, and `Agent` to prove the system works end-to-end.
 
 ## Testing
 

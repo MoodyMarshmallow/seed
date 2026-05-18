@@ -1,13 +1,13 @@
 import type { AgentConfig } from "../../config/schema";
 import type {
-  CreatedSession,
-  SessionManager,
-} from "../../core/sessions/SessionManager";
-import type { SessionSummary } from "../../core/sessions/entries";
+  ConversationManager,
+  CreatedConversation,
+} from "../../core/conversations/ConversationManager";
+import type { ConversationSummary } from "../../core/conversations/entries";
 
 type ConversationSelectionManager = Pick<
-  SessionManager,
-  "listSessions" | "createSession"
+  ConversationManager,
+  "listConversations" | "createConversation"
 >;
 
 export interface ConversationSelectionIo {
@@ -16,7 +16,7 @@ export interface ConversationSelectionIo {
 }
 
 export function formatConversationChoices(
-  conversations: readonly SessionSummary[],
+  conversations: readonly ConversationSummary[],
 ): string {
   const lines = ["Choose a conversation:", "  1. New conversation"];
   conversations.forEach((conversation, index) => {
@@ -48,16 +48,16 @@ export function resolveConversationSelection(
 
 /** Presents saved conversations by number so users do not need to remember IDs. */
 export async function selectInitialConversation(input: {
-  readonly sessions: ConversationSelectionManager;
+  readonly conversations: ConversationSelectionManager;
   readonly config: AgentConfig;
   readonly io: ConversationSelectionIo;
-}): Promise<CreatedSession> {
-  const existing = await input.sessions.listSessions();
+}): Promise<CreatedConversation> {
+  const existing = await input.conversations.listConversations();
   if (existing.length === 0) {
     input.io.write(
       "No existing conversations found. Creating a new conversation.\n",
     );
-    return input.sessions.createSession(input.config);
+    return input.conversations.createConversation(input.config);
   }
 
   input.io.write(formatConversationChoices(existing));
@@ -69,7 +69,7 @@ export async function selectInitialConversation(input: {
       continue;
     }
     if (selection.type === "new") {
-      return input.sessions.createSession(input.config);
+      return input.conversations.createConversation(input.config);
     }
 
     const selected = existing[selection.index];
@@ -80,11 +80,10 @@ export async function selectInitialConversation(input: {
     return {
       id: selected.id,
       filePath: selected.filePath,
-      trunkLeafId: selected.leafId ?? "",
     };
   }
 }
 
-function formatConversationLabel(conversation: SessionSummary): string {
+function formatConversationLabel(conversation: ConversationSummary): string {
   return `${new Date(conversation.timestamp).toLocaleString()} (${conversation.id.slice(0, 8)})`;
 }

@@ -4,24 +4,15 @@ test("renders active conversation history for resumed conversations", async () =
   const output = await renderConversationHistory(
     {
       buildContext: async () => ({
-        sessionId: "conversation_1",
-        leafId: "leaf_1",
+        conversationId: "conversation_1",
         systemPrompt: "Be useful.",
         settings: { model: "gpt-5.5", responseOverrides: {} },
         messages: [
           {
-            type: "message",
-            id: "user_1",
-            parentId: "settings_1",
-            timestamp: "2026-05-16T12:00:00.000Z",
             role: "user",
             content: [{ type: "text", text: "tell me about yourself" }],
           },
           {
-            type: "message",
-            id: "assistant_1",
-            parentId: "user_1",
-            timestamp: "2026-05-16T12:00:01.000Z",
             role: "assistant",
             content: [
               { type: "reasoning_summary", text: "Answer directly." },
@@ -44,16 +35,11 @@ test("renders consecutive history text chunks inline like streaming output", asy
   const output = await renderConversationHistory(
     {
       buildContext: async () => ({
-        sessionId: "conversation_1",
-        leafId: "leaf_1",
+        conversationId: "conversation_1",
         systemPrompt: "Be useful.",
         settings: { model: "gpt-5.5", responseOverrides: {} },
         messages: [
           {
-            type: "message",
-            id: "assistant_1",
-            parentId: "user_1",
-            timestamp: "2026-05-16T12:00:01.000Z",
             role: "assistant",
             content: [
               { type: "text", text: "I" },
@@ -76,8 +62,7 @@ test("renders no history block for a new empty conversation", async () => {
     renderConversationHistory(
       {
         buildContext: async () => ({
-          sessionId: "conversation_1",
-          leafId: "leaf_1",
+          conversationId: "conversation_1",
           systemPrompt: "Be useful.",
           settings: { model: "gpt-5.5", responseOverrides: {} },
           messages: [],

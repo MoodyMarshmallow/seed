@@ -1,25 +1,27 @@
+import type { ConversationManager } from "../../../core/conversations/ConversationManager";
+import type {
+  ConversationMessage,
+  MessageContentBlock,
+} from "../../../core/conversations/entries";
 import type {
   AgentMemory,
   AssistantContentBlock,
   MemoryRecord,
 } from "../../../core/memory/AgentMemory.interface";
 import type { ResponsesMessageInput } from "../../../core/responses/ResponsesTransport.interface";
-import type { SessionManager } from "../../../core/sessions/SessionManager";
-import type {
-  MessageContentBlock,
-  MessageEntry,
-} from "../../../core/sessions/entries";
 
-/** Adapts the current tree-shaped conversation implementation to the Agent Memory seam. */
-export class TreeSessionMemory implements AgentMemory {
-  readonly #sessions: SessionManager;
+/** Adapts linear conversations to the Agent Memory seam. */
+export class ConversationMemory implements AgentMemory {
+  readonly #conversations: ConversationManager;
 
-  constructor(sessions: SessionManager) {
-    this.#sessions = sessions;
+  constructor(conversations: ConversationManager) {
+    this.#conversations = conversations;
   }
 
   async prepareTurn(input: { readonly conversationId: string }) {
-    const context = await this.#sessions.buildContext(input.conversationId);
+    const context = await this.#conversations.buildContext(
+      input.conversationId,
+    );
     return {
       systemPrompt: context.systemPrompt,
       settings: context.settings,
@@ -30,27 +32,27 @@ export class TreeSessionMemory implements AgentMemory {
   async record(record: MemoryRecord): Promise<void> {
     switch (record.type) {
       case "user_message":
-        await this.#sessions.appendMessage(record.conversationId, {
+        await this.#conversations.appendMessage(record.conversationId, {
           role: "user",
           content: [{ type: "text", text: record.content }],
         });
         return;
       case "assistant_message":
-        await this.#sessions.appendMessage(record.conversationId, {
+        await this.#conversations.appendMessage(record.conversationId, {
           role: "assistant",
-          content: record.content.map(toSessionContentBlock),
+          content: record.content.map(toConversationContentBlock),
           raw: record.raw,
         });
         return;
       case "tool_result":
-        await this.#sessions.appendMessage(record.conversationId, {
+        await this.#conversations.appendMessage(record.conversationId, {
           role: "tool_result",
           content: [{ type: "text", text: record.result.output }],
           raw: record.result,
         });
         return;
       case "settings_changed":
-        await this.#sessions.appendSettings(
+        await this.#conversations.updateSettings(
           record.conversationId,
           record.settings,
         );
@@ -59,7 +61,9 @@ export class TreeSessionMemory implements AgentMemory {
   }
 }
 
-function toResponsesMessage(message: MessageEntry): ResponsesMessageInput {
+function toResponsesMessage(
+  message: ConversationMessage,
+): ResponsesMessageInput {
   const callId =
     message.role === "tool_result" &&
     typeof message.raw === "object" &&
@@ -78,7 +82,7 @@ function toResponsesMessage(message: MessageEntry): ResponsesMessageInput {
   };
 }
 
-function toSessionContentBlock(
+function toConversationContentBlock(
   block: AssistantContentBlock,
 ): MessageContentBlock {
   if (block.type === "tool_call") {

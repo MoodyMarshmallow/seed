@@ -1,4 +1,4 @@
-import type { ResponseSettings } from "../sessions/entries";
+import type { ResponseSettings } from "../conversations/entries";
 import type { ToolDefinition } from "../tools/ToolRegistry.interface";
 
 export interface ResponsesMessageInput {
@@ -35,7 +35,14 @@ export type ResponsesStreamEvent =
   | { readonly type: "completed"; readonly raw: unknown }
   | { readonly type: "failed"; readonly error: string; readonly raw: unknown };
 
+/**
+ * Streams normalized model response events.
+ */
 export interface ResponsesTransport {
+  /**
+   * Starts a response for the supplied context and tools.
+   * Events must be yielded in model order with one terminal event.
+   */
   readonly stream: (
     request: ResponsesRequest,
   ) => AsyncIterable<ResponsesStreamEvent>;

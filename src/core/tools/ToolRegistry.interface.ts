@@ -17,7 +17,18 @@ export interface ToolCallResult {
   readonly isError: boolean;
 }
 
+/**
+ * Lists available tools and executes tool calls.
+ */
 export interface ToolRegistry {
+  /**
+   * Returns the tool definitions exposed to the next model pass.
+   */
   readonly list: () => Promise<readonly ToolDefinition[]>;
+
+  /**
+   * Executes one tool call.
+   * The returned `callId` must match the request.
+   */
   readonly execute: (request: ToolCallRequest) => Promise<ToolCallResult>;
 }

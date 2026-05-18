@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { ResponseSettings } from "../../core/sessions/entries";
+import type { ResponseSettings } from "../../core/conversations/entries";
 
 const jsonObjectSchema = z.record(z.string(), z.unknown());
 

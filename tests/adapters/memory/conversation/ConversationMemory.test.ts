@@ -2,23 +2,25 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { JsonlSessionStore } from "../../../../src/adapters/file-system/JsonlSessionStore";
-import { TreeSessionMemory } from "../../../../src/adapters/memory/tree/TreeSessionMemory";
-import { SessionManager } from "../../../../src/core/sessions/SessionManager";
+import { JsonlConversationStore } from "../../../../src/adapters/file-system/JsonlConversationStore";
+import { ConversationMemory } from "../../../../src/adapters/memory/conversation/ConversationMemory";
+import { ConversationManager } from "../../../../src/core/conversations/ConversationManager";
 
-test("tree session memory records conversation events and prepares model input", async () => {
-  const cwd = await mkdtemp(join(tmpdir(), "tree-memory-"));
-  const sessions = new SessionManager({
+test("conversation memory records events and prepares model input", async () => {
+  const cwd = await mkdtemp(join(tmpdir(), "conversation-memory-"));
+  const conversations = new ConversationManager({
     cwd,
-    store: new JsonlSessionStore({ rootDir: join(cwd, ".agent", "sessions") }),
+    store: new JsonlConversationStore({
+      rootDir: join(cwd, ".agent", "conversations"),
+    }),
   });
-  const conversation = await sessions.createSession({
+  const conversation = await conversations.createConversation({
     systemPrompt: "Be direct.",
     model: "gpt-5.5",
     reasoning: { effort: "medium", summary: "auto" },
     responseOverrides: {},
   });
-  const memory = new TreeSessionMemory(sessions);
+  const memory = new ConversationMemory(conversations);
 
   await memory.record({
     type: "user_message",

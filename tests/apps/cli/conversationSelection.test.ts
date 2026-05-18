@@ -18,7 +18,7 @@ test("formats existing conversations as a numbered startup menu", () => {
       id: "da5a5db6-4498-4d09-8729-3c2a222c2853",
       filePath: "/tmp/conversation.jsonl",
       timestamp: "2026-05-16T12:00:00.000Z",
-      leafId: "leaf_1",
+      updatedAt: "2026-05-16T12:00:00.000Z",
     },
   ]);
 
@@ -45,16 +45,16 @@ test("selects an existing conversation by number without requiring users to reme
   const writes: string[] = [];
   const conversation = await selectInitialConversation({
     config,
-    sessions: {
-      listSessions: async () => [
+    conversations: {
+      listConversations: async () => [
         {
           id: "conversation_1",
           filePath: "/tmp/conversation_1.jsonl",
           timestamp: "2026-05-16T12:00:00.000Z",
-          leafId: "leaf_1",
+          updatedAt: "2026-05-16T12:00:00.000Z",
         },
       ],
-      createSession: async () => {
+      createConversation: async () => {
         throw new Error("should not create");
       },
     },
@@ -67,7 +67,6 @@ test("selects an existing conversation by number without requiring users to reme
   expect(conversation).toEqual({
     id: "conversation_1",
     filePath: "/tmp/conversation_1.jsonl",
-    trunkLeafId: "leaf_1",
   });
   expect(writes.join("\n")).toContain("Choose a conversation");
 });

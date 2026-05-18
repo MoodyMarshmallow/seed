@@ -14,22 +14,24 @@ async function main(): Promise<void> {
   }
 
   const cwd = process.env.SEED_CWD ?? process.cwd();
-  const { config, sessions, memory, agent } = await composeCliAgent(cwd, {
+  const { config, conversations, memory, agent } = await composeCliAgent(cwd, {
     headlessAuth: args.includes("--headless-auth"),
   });
   const rl = createCliReadline();
-  let session = args.includes("--resume")
-    ? await sessions.continueRecentOrCreate(config)
+  let conversation = args.includes("--resume")
+    ? await conversations.continueRecentOrCreate(config)
     : await selectInitialConversation({
-        sessions,
+        conversations,
         config,
         io: {
           question: (prompt) => rl.question(prompt),
           write: (text) => process.stdout.write(text),
         },
       });
-  process.stdout.write(`Conversation ${session.id}\n`);
-  process.stdout.write(await renderConversationHistory(sessions, session.id));
+  process.stdout.write(`Conversation ${conversation.id}\n`);
+  process.stdout.write(
+    await renderConversationHistory(conversations, conversation.id),
+  );
   try {
     while (true) {
       const input = (await rl.question("> ")).trim();
@@ -40,15 +42,15 @@ async function main(): Promise<void> {
         return;
       }
       if (input === "/new") {
-        session = await sessions.createSession(config);
-        process.stdout.write(`Conversation ${session.id}\n`);
+        conversation = await conversations.createConversation(config);
+        process.stdout.write(`Conversation ${conversation.id}\n`);
         continue;
       }
       if (input === "/resume") {
-        session = await sessions.continueRecentOrCreate(config);
-        process.stdout.write(`Conversation ${session.id}\n`);
+        conversation = await conversations.continueRecentOrCreate(config);
+        process.stdout.write(`Conversation ${conversation.id}\n`);
         process.stdout.write(
-          await renderConversationHistory(sessions, session.id),
+          await renderConversationHistory(conversations, conversation.id),
         );
         continue;
       }
@@ -58,11 +60,11 @@ async function main(): Promise<void> {
         input.startsWith("/set-json ")
       ) {
         const context = await memory.prepareTurn({
-          conversationId: session.id,
+          conversationId: conversation.id,
         });
         await memory.record({
           type: "settings_changed",
-          conversationId: session.id,
+          conversationId: conversation.id,
           settings: applyCliSettingsCommand(context.settings, input),
         });
         process.stdout.write("Settings updated.\n");
@@ -71,7 +73,7 @@ async function main(): Promise<void> {
 
       const renderer = new CliTurnRenderer();
       for await (const event of agent.runTurn({
-        conversationId: session.id,
+        conversationId: conversation.id,
         input,
       })) {
         const rendered = renderer.render(event);

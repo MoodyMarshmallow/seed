@@ -2,15 +2,15 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { JsonlSessionStore } from "../../../src/adapters/file-system/JsonlSessionStore";
-import { TreeSessionMemory } from "../../../src/adapters/memory/tree/TreeSessionMemory";
+import { JsonlConversationStore } from "../../../src/adapters/file-system/JsonlConversationStore";
+import { ConversationMemory } from "../../../src/adapters/memory/conversation/ConversationMemory";
 import { EmptyToolRegistry } from "../../../src/adapters/tools/EmptyToolRegistry";
 import { Agent } from "../../../src/core/agent/Agent";
+import { ConversationManager } from "../../../src/core/conversations/ConversationManager";
 import type {
   ResponsesRequest,
   ResponsesStreamEvent,
 } from "../../../src/core/responses/ResponsesTransport.interface";
-import { SessionManager } from "../../../src/core/sessions/SessionManager";
 
 class ScriptedTransport {
   readonly requests: ResponsesRequest[] = [];
@@ -45,18 +45,20 @@ class ScriptedTransport {
 
 test("agent turn persists user, assistant, reasoning summary, and missing tool result", async () => {
   const cwd = await mkdtemp(join(tmpdir(), "agent-turn-"));
-  const sessions = new SessionManager({
+  const conversations = new ConversationManager({
     cwd,
-    store: new JsonlSessionStore({ rootDir: join(cwd, ".agent", "sessions") }),
+    store: new JsonlConversationStore({
+      rootDir: join(cwd, ".agent", "conversations"),
+    }),
   });
-  const session = await sessions.createSession({
+  const conversation = await conversations.createConversation({
     systemPrompt: "Be direct.",
     model: "gpt-5.1",
     reasoning: { effort: "medium", summary: "auto" },
     responseOverrides: {},
   });
   const transport = new ScriptedTransport();
-  const memory = new TreeSessionMemory(sessions);
+  const memory = new ConversationMemory(conversations);
   const agent = new Agent({
     memory,
     transport,
@@ -65,13 +67,13 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
 
   const observed = [];
   for await (const event of agent.runTurn({
-    conversationId: session.id,
+    conversationId: conversation.id,
     input: "Please inspect.",
   })) {
     observed.push(event.type);
   }
 
-  const context = await sessions.buildContext(session.id);
+  const context = await conversations.buildContext(conversation.id);
 
   expect(observed).toEqual([
     "reasoning_summary.delta",
@@ -101,11 +103,13 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
 
 test("agent turn yields streaming text before the transport finishes", async () => {
   const cwd = await mkdtemp(join(tmpdir(), "agent-streaming-"));
-  const sessions = new SessionManager({
+  const conversations = new ConversationManager({
     cwd,
-    store: new JsonlSessionStore({ rootDir: join(cwd, ".agent", "sessions") }),
+    store: new JsonlConversationStore({
+      rootDir: join(cwd, ".agent", "conversations"),
+    }),
   });
-  const session = await sessions.createSession({
+  const conversation = await conversations.createConversation({
     systemPrompt: "Be direct.",
     model: "gpt-5.5",
     reasoning: { effort: "medium", summary: "auto" },
@@ -122,7 +126,7 @@ test("agent turn yields streaming text before the transport finishes", async () 
       yield { type: "completed", raw: {} };
     },
   };
-  const memory = new TreeSessionMemory(sessions);
+  const memory = new ConversationMemory(conversations);
   const agent = new Agent({
     memory,
     transport,
@@ -130,7 +134,7 @@ test("agent turn yields streaming text before the transport finishes", async () 
   });
 
   const iterator = agent.runTurn({
-    conversationId: session.id,
+    conversationId: conversation.id,
     input: "Say hi.",
   });
   const first = await iterator.next();
