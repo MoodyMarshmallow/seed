@@ -15,10 +15,10 @@ export interface AgentDependencies {
 
 export interface RunTurnInput {
   readonly conversationId: string;
-  readonly input: string;
+  readonly userMessage: string;
 }
 
-interface AssistantPassResult {
+interface AssistantPassCollector {
   readonly toolCalls: ToolCallRequest[];
 }
 
@@ -38,11 +38,11 @@ export class Agent {
     await this.#memory.record({
       type: "user_message",
       conversationId: input.conversationId,
-      content: input.input,
+      content: input.userMessage,
     });
 
-    const firstPass: AssistantPassResult = { toolCalls: [] };
-    yield* this.#streamAssistantPass(input.conversationId, firstPass);
+    const firstPass: AssistantPassCollector = { toolCalls: [] };
+    yield* this.#streamAndRecordAssistantPass(input.conversationId, firstPass);
 
     if (firstPass.toolCalls.length === 0) {
       yield { type: "completed" };
@@ -50,26 +50,28 @@ export class Agent {
     }
 
     for (const toolCall of firstPass.toolCalls) {
-      const result = await this.#tools.execute(toolCall);
+      const toolResult = await this.#tools.execute(toolCall);
       await this.#memory.record({
         type: "tool_result",
         conversationId: input.conversationId,
-        result,
+        result: toolResult,
       });
-      yield { type: "tool_result", ...result };
+      yield { type: "tool_result", ...toolResult };
     }
 
-    yield* this.#streamAssistantPass(input.conversationId, { toolCalls: [] });
+    yield* this.#streamAndRecordAssistantPass(input.conversationId, {
+      toolCalls: [],
+    });
     yield { type: "completed" };
   }
 
-  async *#streamAssistantPass(
+  async *#streamAndRecordAssistantPass(
     conversationId: string,
-    result: AssistantPassResult,
+    passCollector: AssistantPassCollector,
   ): AsyncGenerator<AgentTurnEvent> {
     const context = await this.#memory.prepareTurn({ conversationId });
     const tools = await this.#tools.list();
-    const content: AssistantContentBlock[] = [];
+    const assistantContentBlocks: AssistantContentBlock[] = [];
 
     for await (const event of this.#model.stream({
       systemPrompt: context.systemPrompt,
@@ -79,11 +81,14 @@ export class Agent {
     })) {
       switch (event.type) {
         case "reasoning_summary.delta":
-          content.push({ type: "reasoning_summary", text: event.delta });
+          assistantContentBlocks.push({
+            type: "reasoning_summary",
+            text: event.delta,
+          });
           yield { type: event.type, delta: event.delta };
           break;
         case "text.delta":
-          content.push({ type: "text", text: event.delta });
+          assistantContentBlocks.push({ type: "text", text: event.delta });
           yield { type: event.type, delta: event.delta };
           break;
         case "tool_call": {
@@ -92,13 +97,17 @@ export class Agent {
             name: event.name,
             input: event.input,
           };
-          result.toolCalls.push(toolCall);
-          content.push({ type: "tool_call", toolCall });
+          passCollector.toolCalls.push(toolCall);
+          assistantContentBlocks.push({ type: "tool_call", toolCall });
           yield { type: "tool_call", ...toolCall };
           break;
         }
         case "failed":
-          content.push({ type: "error", text: event.error, raw: event.raw });
+          assistantContentBlocks.push({
+            type: "error",
+            text: event.error,
+            raw: event.raw,
+          });
           break;
         case "completed":
           break;
@@ -108,7 +117,7 @@ export class Agent {
     await this.#memory.record({
       type: "assistant_message",
       conversationId,
-      content,
+      content: assistantContentBlocks,
     });
   }
 }

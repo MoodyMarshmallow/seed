@@ -74,7 +74,7 @@ async function main(): Promise<void> {
       const renderer = new CliTurnRenderer();
       for await (const event of agent.runTurn({
         conversationId: conversation.id,
-        input,
+        userMessage: input,
       })) {
         const rendered = renderer.render(event);
         if (rendered.length > 0) {

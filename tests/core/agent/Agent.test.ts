@@ -66,7 +66,7 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
   const observed = [];
   for await (const event of agent.runTurn({
     conversationId: conversation.id,
-    input: "Please inspect.",
+    userMessage: "Please inspect.",
   })) {
     observed.push(event.type);
   }
@@ -133,7 +133,7 @@ test("agent turn yields streaming text before the model finishes", async () => {
 
   const iterator = agent.runTurn({
     conversationId: conversation.id,
-    input: "Say hi.",
+    userMessage: "Say hi.",
   });
   const first = await iterator.next();
 
