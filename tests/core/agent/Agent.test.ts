@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { JsonlConversationStore } from "../../../src/adapters/file-system/JsonlConversationStore";
-import { ConversationMemory } from "../../../src/adapters/memory/conversation/ConversationMemory";
+import { SimpleLinearMemory } from "../../../src/adapters/memory/simple-linear/SimpleLinearMemory";
 import { Agent } from "../../../src/core/agent/Agent";
 import { ConversationManager } from "../../../src/core/conversations/ConversationManager";
 import type {
@@ -56,7 +56,7 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
     responseOverrides: {},
   });
   const model = new ScriptedModelClient();
-  const memory = new ConversationMemory(conversations);
+  const memory = new SimpleLinearMemory(conversations);
   const agent = new Agent({
     memory,
     model,
@@ -124,7 +124,7 @@ test("agent turn yields streaming text before the model finishes", async () => {
       yield { type: "completed", raw: {} };
     },
   };
-  const memory = new ConversationMemory(conversations);
+  const memory = new SimpleLinearMemory(conversations);
   const agent = new Agent({
     memory,
     model,

@@ -10,8 +10,8 @@ import type {
 } from "../../../core/memory/AgentMemory.interface";
 import type { ModelMessageInput } from "../../../core/model/ModelClient.interface";
 
-/** Adapts linear conversations to the Agent Memory seam. */
-export class ConversationMemory implements AgentMemory {
+/** Simple placeholder AgentMemory backed by one linear conversation timeline. */
+export class SimpleLinearMemory implements AgentMemory {
   readonly #conversations: ConversationManager;
 
   constructor(conversations: ConversationManager) {
@@ -25,7 +25,7 @@ export class ConversationMemory implements AgentMemory {
     return {
       systemPrompt: context.systemPrompt,
       settings: context.settings,
-      messages: context.messages.map(toResponsesMessage),
+      messages: context.messages.map(toModelMessage),
     };
   }
 
@@ -61,7 +61,7 @@ export class ConversationMemory implements AgentMemory {
   }
 }
 
-function toResponsesMessage(message: ConversationMessage): ModelMessageInput {
+function toModelMessage(message: ConversationMessage): ModelMessageInput {
   const callId =
     message.role === "tool_result" &&
     typeof message.raw === "object" &&

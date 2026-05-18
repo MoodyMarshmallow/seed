@@ -3,11 +3,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { JsonlConversationStore } from "../../../../src/adapters/file-system/JsonlConversationStore";
-import { ConversationMemory } from "../../../../src/adapters/memory/conversation/ConversationMemory";
+import { SimpleLinearMemory } from "../../../../src/adapters/memory/simple-linear/SimpleLinearMemory";
 import { ConversationManager } from "../../../../src/core/conversations/ConversationManager";
 
-test("conversation memory records events and prepares model input", async () => {
-  const cwd = await mkdtemp(join(tmpdir(), "conversation-memory-"));
+test("simple linear memory records events and prepares model input", async () => {
+  const cwd = await mkdtemp(join(tmpdir(), "simple-linear-memory-"));
   const conversations = new ConversationManager({
     cwd,
     store: new JsonlConversationStore({
@@ -20,7 +20,7 @@ test("conversation memory records events and prepares model input", async () => 
     reasoning: { effort: "medium", summary: "auto" },
     responseOverrides: {},
   });
-  const memory = new ConversationMemory(conversations);
+  const memory = new SimpleLinearMemory(conversations);
 
   await memory.record({
     type: "user_message",

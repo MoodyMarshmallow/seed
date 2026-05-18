@@ -5,7 +5,7 @@ import { CodexOAuthFlow } from "../../adapters/codex/auth/CodexOAuthFlow";
 import { CodexModelClient } from "../../adapters/codex/responses/CodexModelClient";
 import { JsonFileTokenStore } from "../../adapters/file-system/JsonFileTokenStore";
 import { JsonlConversationStore } from "../../adapters/file-system/JsonlConversationStore";
-import { ConversationMemory } from "../../adapters/memory/conversation/ConversationMemory";
+import { SimpleLinearMemory } from "../../adapters/memory/simple-linear/SimpleLinearMemory";
 import { MathTool } from "../../adapters/tools/MathTool";
 import { loadAgentConfig } from "../../config/config";
 import { Agent } from "../../core/agent/Agent";
@@ -44,7 +44,7 @@ export async function composeCliAgent(
     getAccessToken: () => auth.getAccessToken(),
   });
   const tools = new ToolRegistry([new MathTool()]);
-  const memory = new ConversationMemory(conversations);
+  const memory = new SimpleLinearMemory(conversations);
   return {
     config,
     conversations,
