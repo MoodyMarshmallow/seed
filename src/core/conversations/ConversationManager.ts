@@ -12,7 +12,7 @@ import type {
 import { CONVERSATION_SCHEMA_VERSION } from "./entries";
 import { createTurnId, nowIso } from "./ids";
 
-interface ConversationManagerOptions {
+interface ConversationManagerDependencies {
   readonly cwd: string;
   readonly store: ConversationStore;
 }
@@ -31,9 +31,9 @@ export class ConversationManager {
   readonly #cwd: string;
   readonly #store: ConversationStore;
 
-  constructor(options: ConversationManagerOptions) {
-    this.#cwd = options.cwd;
-    this.#store = options.store;
+  constructor(dependencies: ConversationManagerDependencies) {
+    this.#cwd = dependencies.cwd;
+    this.#store = dependencies.store;
   }
 
   async createConversation(
@@ -41,7 +41,7 @@ export class ConversationManager {
   ): Promise<CreatedConversation> {
     const conversationId = randomUUID();
     const timestamp = nowIso();
-    const record: ConversationRecord = {
+    const conversationRecord: ConversationRecord = {
       header: {
         type: "conversation",
         version: CONVERSATION_SCHEMA_VERSION,
@@ -58,11 +58,11 @@ export class ConversationManager {
       },
       turns: [],
     };
-    const filePath = await this.#store.create(record);
+    const filePath = await this.#store.create(conversationRecord);
     return { id: conversationId, filePath };
   }
 
-  async continueRecentOrCreate(
+  async resumeMostRecentOrCreate(
     input: CreateConversationInput,
   ): Promise<CreatedConversation> {
     const [recent] = await this.#store.list();
@@ -72,16 +72,16 @@ export class ConversationManager {
     return this.createConversation(input);
   }
 
-  async appendMessage(
+  async recordMessage(
     conversationId: string,
     message: ConversationMessage,
   ): Promise<ConversationMessage> {
-    const record = await this.#store.read(conversationId);
-    const turns = [...record.turns];
-    const latest = turns.at(-1);
+    const conversationRecord = await this.#store.read(conversationId);
+    const turns = [...conversationRecord.turns];
+    const latestTurn = turns.at(-1);
 
     if (message.role === "user") {
-      if (latest?.status === "open") {
+      if (latestTurn?.status === "open") {
         throw new AgentError({
           code: "conversation_invalid",
           message: "Cannot start a new turn while another turn is open.",
@@ -93,11 +93,13 @@ export class ConversationManager {
         status: "open",
         messages: [message],
       });
-    } else if (latest?.status === "open") {
+    } else if (latestTurn?.status === "open") {
       turns[turns.length - 1] = {
-        ...latest,
-        status: completesTurn(message) ? "completed" : latest.status,
-        messages: [...latest.messages, message],
+        ...latestTurn,
+        status: assistantMessageCompletesTurn(message)
+          ? "completed"
+          : latestTurn.status,
+        messages: [...latestTurn.messages, message],
       };
     } else {
       throw new AgentError({
@@ -107,7 +109,7 @@ export class ConversationManager {
     }
 
     await this.#store.write({
-      header: { ...record.header, updatedAt: nowIso() },
+      header: { ...conversationRecord.header, updatedAt: nowIso() },
       turns,
     });
     return message;
@@ -117,28 +119,28 @@ export class ConversationManager {
     conversationId: string,
     settings: ResponseSettings,
   ): Promise<void> {
-    const record = await this.#store.read(conversationId);
+    const conversationRecord = await this.#store.read(conversationId);
     await this.#store.write({
-      ...record,
-      header: { ...record.header, updatedAt: nowIso(), settings },
+      ...conversationRecord,
+      header: { ...conversationRecord.header, updatedAt: nowIso(), settings },
     });
   }
 
   async undoLatestTurn(conversationId: string): Promise<void> {
-    const record = await this.#store.read(conversationId);
+    const conversationRecord = await this.#store.read(conversationId);
     await this.#store.write({
-      header: { ...record.header, updatedAt: nowIso() },
-      turns: record.turns.slice(0, -1),
+      header: { ...conversationRecord.header, updatedAt: nowIso() },
+      turns: conversationRecord.turns.slice(0, -1),
     });
   }
 
   async buildContext(conversationId: string): Promise<ConversationContext> {
-    const record = await this.#store.read(conversationId);
+    const conversationRecord = await this.#store.read(conversationId);
     return {
       conversationId,
-      systemPrompt: record.header.systemPrompt,
-      settings: record.header.settings,
-      messages: record.turns.flatMap((turn) => turn.messages),
+      systemPrompt: conversationRecord.header.systemPrompt,
+      settings: conversationRecord.header.settings,
+      messages: conversationRecord.turns.flatMap((turn) => turn.messages),
     };
   }
 
@@ -147,7 +149,7 @@ export class ConversationManager {
   }
 }
 
-function completesTurn(message: ConversationMessage) {
+function assistantMessageCompletesTurn(message: ConversationMessage) {
   if (message.role !== "assistant") {
     return false;
   }

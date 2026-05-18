@@ -21,11 +21,11 @@ test("conversations keep latest settings and undo removes the latest turn from r
     responseOverrides: { temperature: 0.1 },
   });
 
-  await conversations.appendMessage(conversation.id, {
+  await conversations.recordMessage(conversation.id, {
     role: "user",
     content: [{ type: "text", text: "First" }],
   });
-  await conversations.appendMessage(conversation.id, {
+  await conversations.recordMessage(conversation.id, {
     role: "assistant",
     content: [{ type: "text", text: "Done" }],
   });
@@ -34,7 +34,7 @@ test("conversations keep latest settings and undo removes the latest turn from r
     reasoning: { effort: "low", summary: "auto" },
     responseOverrides: {},
   });
-  await conversations.appendMessage(conversation.id, {
+  await conversations.recordMessage(conversation.id, {
     role: "user",
     content: [{ type: "text", text: "Second" }],
   });
@@ -72,13 +72,13 @@ test("conversations allow only one open turn", async () => {
     responseOverrides: {},
   });
 
-  await conversations.appendMessage(conversation.id, {
+  await conversations.recordMessage(conversation.id, {
     role: "user",
     content: [{ type: "text", text: "First" }],
   });
 
   await expect(
-    conversations.appendMessage(conversation.id, {
+    conversations.recordMessage(conversation.id, {
       role: "user",
       content: [{ type: "text", text: "Second" }],
     }),

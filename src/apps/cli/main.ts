@@ -19,7 +19,7 @@ async function main(): Promise<void> {
   });
   const rl = createCliReadline();
   let conversation = args.includes("--resume")
-    ? await conversations.continueRecentOrCreate(config)
+    ? await conversations.resumeMostRecentOrCreate(config)
     : await selectInitialConversation({
         conversations,
         config,
@@ -47,7 +47,7 @@ async function main(): Promise<void> {
         continue;
       }
       if (input === "/resume") {
-        conversation = await conversations.continueRecentOrCreate(config);
+        conversation = await conversations.resumeMostRecentOrCreate(config);
         process.stdout.write(`Conversation ${conversation.id}\n`);
         process.stdout.write(
           await renderConversationHistory(conversations, conversation.id),

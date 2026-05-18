@@ -32,20 +32,20 @@ export class ConversationMemory implements AgentMemory {
   async record(record: MemoryRecord): Promise<void> {
     switch (record.type) {
       case "user_message":
-        await this.#conversations.appendMessage(record.conversationId, {
+        await this.#conversations.recordMessage(record.conversationId, {
           role: "user",
           content: [{ type: "text", text: record.content }],
         });
         return;
       case "assistant_message":
-        await this.#conversations.appendMessage(record.conversationId, {
+        await this.#conversations.recordMessage(record.conversationId, {
           role: "assistant",
           content: record.content.map(toConversationContentBlock),
           raw: record.raw,
         });
         return;
       case "tool_result":
-        await this.#conversations.appendMessage(record.conversationId, {
+        await this.#conversations.recordMessage(record.conversationId, {
           role: "tool_result",
           content: [{ type: "text", text: record.result.output }],
           raw: record.result,
