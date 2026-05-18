@@ -47,34 +47,40 @@ export function resolveConversationSelection(
 }
 
 /** Presents saved conversations by number so users do not need to remember IDs. */
-export async function selectInitialConversation(input: {
+export async function selectInitialConversation(dependencies: {
   readonly conversations: ConversationSelectionManager;
   readonly config: AgentConfig;
   readonly io: ConversationSelectionIo;
 }): Promise<CreatedConversation> {
-  const existing = await input.conversations.listConversations();
+  const existing = await dependencies.conversations.listConversations();
   if (existing.length === 0) {
-    input.io.write(
+    dependencies.io.write(
       "No existing conversations found. Creating a new conversation.\n",
     );
-    return input.conversations.createConversation(input.config);
+    return dependencies.conversations.createConversation(dependencies.config);
   }
 
-  input.io.write(formatConversationChoices(existing));
+  dependencies.io.write(formatConversationChoices(existing));
   while (true) {
-    const answer = await input.io.question("Select conversation number: ");
+    const answer = await dependencies.io.question(
+      "Select conversation number: ",
+    );
     const selection = resolveConversationSelection(answer, existing.length);
     if (!selection) {
-      input.io.write(`Enter a number from 1 to ${existing.length + 1}.\n`);
+      dependencies.io.write(
+        `Enter a number from 1 to ${existing.length + 1}.\n`,
+      );
       continue;
     }
     if (selection.type === "new") {
-      return input.conversations.createConversation(input.config);
+      return dependencies.conversations.createConversation(dependencies.config);
     }
 
     const selected = existing[selection.index];
     if (!selected) {
-      input.io.write(`Enter a number from 1 to ${existing.length + 1}.\n`);
+      dependencies.io.write(
+        `Enter a number from 1 to ${existing.length + 1}.\n`,
+      );
       continue;
     }
     return {

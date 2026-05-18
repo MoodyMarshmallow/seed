@@ -3,13 +3,13 @@ import { spawn } from "node:child_process";
 import type { CodexOAuthLogin } from "../../adapters/codex/auth/CodexOAuthFlow";
 import type { TokenStore } from "../../core/auth/TokenStore.interface";
 
-interface OAuthFlowPort {
+interface CliOAuthFlow {
   readonly start: () => Promise<CodexOAuthLogin>;
 }
 
 interface EnsureCliAuthOptions {
   readonly tokenStore: TokenStore;
-  readonly oauthFlow: OAuthFlowPort;
+  readonly oauthFlow: CliOAuthFlow;
   readonly exchangeAuthorizationCode: (input: {
     readonly authorizationCode: string;
     readonly redirectUri: string;
@@ -53,7 +53,11 @@ async function openBrowser(url: string): Promise<void> {
       : process.platform === "win32"
         ? "cmd"
         : "xdg-open";
-  const args = process.platform === "win32" ? ["/c", "start", "", url] : [url];
-  const child = spawn(command, args, { detached: true, stdio: "ignore" });
+  const commandArgs =
+    process.platform === "win32" ? ["/c", "start", "", url] : [url];
+  const child = spawn(command, commandArgs, {
+    detached: true,
+    stdio: "ignore",
+  });
   child.unref();
 }

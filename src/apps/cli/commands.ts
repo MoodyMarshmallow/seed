@@ -14,8 +14,8 @@ Options:
   --headless-auth        Print the OAuth URL instead of opening a browser
 
 Chat commands:
-  /model <model>          Change the branch-local model setting
-  /reasoning <effort>     Change branch-local reasoning effort
+  /model <model>          Change the conversation model setting
+  /reasoning <effort>     Change conversation reasoning effort
   /set-json <json>        Merge arbitrary Responses overrides
   /new                    Start a new conversation
   /resume                 Resume the most recent conversation
@@ -23,7 +23,7 @@ Chat commands:
 `;
 }
 
-/** Applies CLI-only settings commands to the current branch-local settings snapshot. */
+/** Applies CLI-only settings commands to the current conversation settings. */
 export function applyCliSettingsCommand(
   settings: ResponseSettings,
   command: string,

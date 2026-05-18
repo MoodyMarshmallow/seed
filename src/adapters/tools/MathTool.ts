@@ -37,42 +37,42 @@ export class MathTool implements Tool {
   readonly definition = MATH_TOOL;
 
   async execute(request: ToolCallRequest): Promise<ToolCallResult> {
-    const input = parseMathInput(request.input);
-    if (typeof input === "string") {
-      return toolError(request, input);
+    const rawInput = parseMathInput(request.input);
+    if (typeof rawInput === "string") {
+      return toolErrorResult(request, rawInput);
     }
 
-    if (input.operation === "divide" && input.right === 0) {
-      return toolError(request, "Cannot divide by zero.");
+    if (rawInput.operation === "divide" && rawInput.right === 0) {
+      return toolErrorResult(request, "Cannot divide by zero.");
     }
 
     return {
       callId: request.callId,
       name: request.name,
-      output: String(calculate(input)),
+      output: String(calculateMathResult(rawInput)),
       isError: false,
     };
   }
 }
 
-function parseMathInput(input: unknown): MathInput | string {
-  if (!input || typeof input !== "object") {
+function parseMathInput(rawInput: unknown): MathInput | string {
+  if (!rawInput || typeof rawInput !== "object") {
     return "Math input must be an object.";
   }
-  const candidate = input as Record<string, unknown>;
-  if (!isOperation(candidate.operation)) {
+  const inputObject = rawInput as Record<string, unknown>;
+  if (!isOperation(inputObject.operation)) {
     return "Math operation must be add, subtract, multiply, or divide.";
   }
   if (
-    typeof candidate.left !== "number" ||
-    typeof candidate.right !== "number"
+    typeof inputObject.left !== "number" ||
+    typeof inputObject.right !== "number"
   ) {
     return "Math operands must be numbers.";
   }
   return {
-    operation: candidate.operation,
-    left: candidate.left,
-    right: candidate.right,
+    operation: inputObject.operation,
+    left: inputObject.left,
+    right: inputObject.right,
   };
 }
 
@@ -85,7 +85,7 @@ function isOperation(value: unknown): value is MathOperation {
   );
 }
 
-function calculate(input: MathInput): number {
+function calculateMathResult(input: MathInput): number {
   switch (input.operation) {
     case "add":
       return input.left + input.right;
@@ -98,7 +98,10 @@ function calculate(input: MathInput): number {
   }
 }
 
-function toolError(request: ToolCallRequest, output: string): ToolCallResult {
+function toolErrorResult(
+  request: ToolCallRequest,
+  output: string,
+): ToolCallResult {
   return {
     callId: request.callId,
     name: request.name,

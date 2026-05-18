@@ -7,24 +7,24 @@ import { createCliReadline } from "./readline";
 import { CliTurnRenderer } from "./render";
 
 async function main(): Promise<void> {
-  const args = process.argv.slice(2);
-  if (args.includes("--help") || args.includes("-h")) {
+  const cliArgs = process.argv.slice(2);
+  if (cliArgs.includes("--help") || cliArgs.includes("-h")) {
     process.stdout.write(helpText());
     return;
   }
 
   const cwd = process.env.SEED_CWD ?? process.cwd();
   const { config, conversations, memory, agent } = await composeCliAgent(cwd, {
-    headlessAuth: args.includes("--headless-auth"),
+    headlessAuth: cliArgs.includes("--headless-auth"),
   });
-  const rl = createCliReadline();
-  let conversation = args.includes("--resume")
+  const readline = createCliReadline();
+  let conversation = cliArgs.includes("--resume")
     ? await conversations.resumeMostRecentOrCreate(config)
     : await selectInitialConversation({
         conversations,
         config,
         io: {
-          question: (prompt) => rl.question(prompt),
+          question: (prompt) => readline.question(prompt),
           write: (text) => process.stdout.write(text),
         },
       });
@@ -34,19 +34,19 @@ async function main(): Promise<void> {
   );
   try {
     while (true) {
-      const input = (await rl.question("> ")).trim();
-      if (input.length === 0) {
+      const userInput = (await readline.question("> ")).trim();
+      if (userInput.length === 0) {
         continue;
       }
-      if (input === "/exit") {
+      if (userInput === "/exit") {
         return;
       }
-      if (input === "/new") {
+      if (userInput === "/new") {
         conversation = await conversations.createConversation(config);
         process.stdout.write(`Conversation ${conversation.id}\n`);
         continue;
       }
-      if (input === "/resume") {
+      if (userInput === "/resume") {
         conversation = await conversations.resumeMostRecentOrCreate(config);
         process.stdout.write(`Conversation ${conversation.id}\n`);
         process.stdout.write(
@@ -55,17 +55,17 @@ async function main(): Promise<void> {
         continue;
       }
       if (
-        input.startsWith("/model ") ||
-        input.startsWith("/reasoning ") ||
-        input.startsWith("/set-json ")
+        userInput.startsWith("/model ") ||
+        userInput.startsWith("/reasoning ") ||
+        userInput.startsWith("/set-json ")
       ) {
-        const context = await memory.prepareTurn({
+        const preparedTurn = await memory.prepareTurn({
           conversationId: conversation.id,
         });
         await memory.record({
           type: "settings_changed",
           conversationId: conversation.id,
-          settings: applyCliSettingsCommand(context.settings, input),
+          settings: applyCliSettingsCommand(preparedTurn.settings, userInput),
         });
         process.stdout.write("Settings updated.\n");
         continue;
@@ -74,16 +74,16 @@ async function main(): Promise<void> {
       const renderer = new CliTurnRenderer();
       for await (const event of agent.runTurn({
         conversationId: conversation.id,
-        userMessage: input,
+        userMessage: userInput,
       })) {
-        const rendered = renderer.render(event);
-        if (rendered.length > 0) {
-          process.stdout.write(rendered);
+        const renderedEventChunk = renderer.render(event);
+        if (renderedEventChunk.length > 0) {
+          process.stdout.write(renderedEventChunk);
         }
       }
     }
   } finally {
-    rl.close();
+    readline.close();
   }
 }
 

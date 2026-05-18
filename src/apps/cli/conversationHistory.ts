@@ -1,17 +1,17 @@
 import type { ConversationManager } from "../../core/conversations/ConversationManager";
 import type { ConversationMessage } from "../../core/conversations/entries";
 
-/** Renders the active branch history for a resumed conversation. */
+/** Renders previous messages for a resumed conversation. */
 export async function renderConversationHistory(
   conversations: Pick<ConversationManager, "buildContext">,
   conversationId: string,
 ): Promise<string> {
-  const context = await conversations.buildContext(conversationId);
-  if (context.messages.length === 0) {
+  const conversationContext = await conversations.buildContext(conversationId);
+  if (conversationContext.messages.length === 0) {
     return "";
   }
 
-  return `\nPrevious conversation:\n${context.messages.map(renderMessage).join("\n\n")}\n\n`;
+  return `\nPrevious conversation:\n${conversationContext.messages.map(renderMessage).join("\n\n")}\n\n`;
 }
 
 function renderMessage(message: ConversationMessage): string {
@@ -40,9 +40,9 @@ function renderContentBlocks(content: ConversationMessage["content"]): string {
       textBuffer = "";
     }
 
-    const rendered = renderContentBlock(block);
-    if (rendered.length > 0) {
-      lines.push(rendered);
+    const renderedContentBlock = renderContentBlock(block);
+    if (renderedContentBlock.length > 0) {
+      lines.push(renderedContentBlock);
     }
   }
 
