@@ -121,3 +121,72 @@ test("Codex model client includes response error details when the backend reject
     }
   }).rejects.toThrow("bad request detail");
 });
+
+test("Codex model client replays tool calls before their outputs", async () => {
+  const requests: Array<{ readonly body: Record<string, unknown> }> = [];
+  const model = new CodexModelClient({
+    getAccessToken: async () => "access-token",
+    fetch: async (_input, init) => {
+      requests.push({ body: JSON.parse(String(init?.body)) });
+      return new Response(
+        sseStream([{ type: "response.completed", response: { id: "resp_1" } }]),
+        { status: 200 },
+      );
+    },
+  });
+
+  for await (const _event of model.stream({
+    systemPrompt: "Be useful.",
+    settings: {
+      model: "gpt-5.5",
+      reasoning: { effort: "medium", summary: "auto" },
+      responseOverrides: {},
+    },
+    messages: [
+      { role: "user", content: "Calculate three sums." },
+      { role: "assistant", content: "I will calculate them." },
+      {
+        role: "tool_call",
+        callId: "call_1",
+        name: "math",
+        input: { operation: "add", left: 1, right: 2 },
+      },
+      {
+        role: "tool_call",
+        callId: "call_2",
+        name: "math",
+        input: { operation: "add", left: 15, right: 20 },
+      },
+      { role: "tool_result", callId: "call_1", content: "3" },
+      { role: "tool_result", callId: "call_2", content: "35" },
+    ],
+    tools: [],
+  })) {
+    // consume stream
+  }
+
+  expect(requests[0]?.body.input).toEqual([
+    {
+      role: "user",
+      content: [{ type: "input_text", text: "Calculate three sums." }],
+    },
+    {
+      role: "assistant",
+      content: [{ type: "output_text", text: "I will calculate them." }],
+    },
+    {
+      type: "function_call",
+      call_id: "call_1",
+      name: "math",
+      arguments: JSON.stringify({ operation: "add", left: 1, right: 2 }),
+    },
+    {
+      type: "function_call",
+      call_id: "call_2",
+      name: "math",
+      arguments: JSON.stringify({ operation: "add", left: 15, right: 20 }),
+    },
+    { type: "function_call_output", call_id: "call_1", output: "3" },
+    { type: "function_call_output", call_id: "call_2", output: "35" },
+  ]);
+});

@@ -59,7 +59,13 @@ test("simple linear memory records events and prepares model input", async () =>
       { role: "user", content: "Use the tool." },
       {
         role: "assistant",
-        content: 'Checking...{"callId":"call_1","name":"bash","input":{}}',
+        content: "Checking...",
+      },
+      {
+        role: "tool_call",
+        callId: "call_1",
+        name: "bash",
+        input: {},
       },
       { role: "tool_result", content: "Tool unavailable.", callId: "call_1" },
     ],

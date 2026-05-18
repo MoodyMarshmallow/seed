@@ -4,13 +4,13 @@
 
 `seed` is a minimal Bun/TypeScript coding-agent template. It provides a small core Agent with replaceable seams for memory, model clients, auth token storage, conversation storage, and tools.
 
-The included CLI is for demonstration and testing, not the product surface. It wires the core Agent to Codex subscription auth, the ChatGPT Codex Responses endpoint, JSONL conversation storage, and a small example math tool so the template can run end-to-end locally.
+There is an included CLI for demonstration and testing purpoposes. It wires the core Agent to Codex subscription auth, the OpenAI Responses API, JSONL conversation storage, and a small example math tool so the template can run end-to-end locally.
 
 ## Quickstart
 
 ```bash
 bun install
-bun run agent
+bun run agent # run the CLI
 ```
 
 On first run, the CLI starts a Codex OAuth flow and stores local state in `.agent/`, which is gitignored.

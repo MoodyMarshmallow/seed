@@ -25,7 +25,7 @@ export class SimpleLinearMemory implements AgentMemory {
     return {
       systemPrompt: context.systemPrompt,
       settings: context.settings,
-      messages: context.messages.map(toModelMessage),
+      messages: context.messages.flatMap(toModelMessages),
     };
   }
 
@@ -61,7 +61,13 @@ export class SimpleLinearMemory implements AgentMemory {
   }
 }
 
-function toModelMessage(message: ConversationMessage): ModelMessageInput {
+function toModelMessages(
+  message: ConversationMessage,
+): readonly ModelMessageInput[] {
+  if (message.role === "assistant") {
+    return toAssistantModelMessages(message);
+  }
+
   const callId =
     message.role === "tool_result" &&
     typeof message.raw === "object" &&
@@ -70,13 +76,67 @@ function toModelMessage(message: ConversationMessage): ModelMessageInput {
       ? String(message.raw.callId)
       : undefined;
 
+  if (message.role === "tool_result" && callId) {
+    return [{ role: message.role, content: textContent(message), callId }];
+  }
+  if (message.role === "tool_result") {
+    return [{ role: message.role, content: textContent(message), callId: "" }];
+  }
+
+  return [
+    {
+      role: message.role,
+      content: textContent(message),
+    },
+  ];
+}
+
+function toAssistantModelMessages(
+  message: ConversationMessage,
+): readonly ModelMessageInput[] {
+  const messages: ModelMessageInput[] = [];
+  const text = textContent(message);
+  if (text.length > 0) {
+    messages.push({ role: "assistant", content: text });
+  }
+
+  for (const block of message.content) {
+    if (block.type !== "tool_call") {
+      continue;
+    }
+    const toolCall = parseToolCall(block.raw);
+    if (toolCall) {
+      messages.push(toolCall);
+    }
+  }
+
+  return messages;
+}
+
+function textContent(message: ConversationMessage): string {
+  return message.content
+    .filter((block) => block.type !== "reasoning_summary")
+    .filter((block) => block.type !== "tool_call")
+    .map((block) => block.text ?? JSON.stringify(block.raw))
+    .join("");
+}
+
+function parseToolCall(raw: unknown): ModelMessageInput | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+  const toolCall = raw as Record<string, unknown>;
+  if (
+    typeof toolCall.callId !== "string" ||
+    typeof toolCall.name !== "string"
+  ) {
+    return null;
+  }
   return {
-    role: message.role,
-    content: message.content
-      .filter((block) => block.type !== "reasoning_summary")
-      .map((block) => block.text ?? JSON.stringify(block.raw))
-      .join(""),
-    ...(callId ? { callId } : {}),
+    role: "tool_call",
+    callId: toolCall.callId,
+    name: toolCall.name,
+    input: toolCall.input,
   };
 }
 

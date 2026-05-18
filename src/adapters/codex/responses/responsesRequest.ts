@@ -10,6 +10,14 @@ export function buildCodexResponsesBody(
     store: false,
     reasoning: request.settings.reasoning,
     input: request.messages.map((message) => {
+      if (message.role === "tool_call") {
+        return {
+          type: "function_call",
+          call_id: message.callId,
+          name: message.name,
+          arguments: JSON.stringify(message.input),
+        };
+      }
       if (message.role === "tool_result") {
         return {
           type: "function_call_output",

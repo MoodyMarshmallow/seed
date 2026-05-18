@@ -1,11 +1,22 @@
 import type { ResponseSettings } from "../conversations/entries";
 import type { ToolDefinition } from "../tools/Tool.interface";
 
-export interface ModelMessageInput {
-  readonly role: "user" | "assistant" | "tool_result";
-  readonly content: string;
-  readonly callId?: string | undefined;
-}
+export type ModelMessageInput =
+  | {
+      readonly role: "user" | "assistant";
+      readonly content: string;
+    }
+  | {
+      readonly role: "tool_call";
+      readonly callId: string;
+      readonly name: string;
+      readonly input: unknown;
+    }
+  | {
+      readonly role: "tool_result";
+      readonly callId: string;
+      readonly content: string;
+    };
 
 export interface ModelRequest {
   readonly systemPrompt: string;

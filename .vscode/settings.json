@@ -6,7 +6,7 @@
       "url": "https://opencode.ai/config.json"
     },
     {
-      "fileMatch": ["*"] ,
+      "fileMatch": ["*"],
       "url": "https://models.dev/model-schema.json"
     }
   ]

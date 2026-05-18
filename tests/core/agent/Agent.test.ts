@@ -29,6 +29,13 @@ class ScriptedModelClient {
         input: {},
         raw: {},
       };
+      yield {
+        type: "tool_call",
+        callId: "call_2",
+        name: "math",
+        input: { operation: "add", left: 2, right: 3 },
+        raw: {},
+      };
       yield { type: "completed", raw: {} };
       return;
     }
@@ -77,18 +84,38 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
     "reasoning_summary.delta",
     "text.delta",
     "tool_call",
+    "tool_call",
+    "tool_result",
     "tool_result",
     "text.delta",
     "completed",
   ]);
   expect(model.requests).toHaveLength(2);
-  expect(model.requests[1]?.messages.at(-1)).toMatchObject({
-    role: "tool_result",
-    callId: "call_1",
-  });
+  expect(model.requests[1]?.messages).toEqual([
+    { role: "user", content: "Please inspect." },
+    { role: "assistant", content: "Checking..." },
+    { role: "tool_call", callId: "call_1", name: "bash", input: {} },
+    {
+      role: "tool_call",
+      callId: "call_2",
+      name: "math",
+      input: { operation: "add", left: 2, right: 3 },
+    },
+    {
+      role: "tool_result",
+      callId: "call_1",
+      content: "Tool 'bash' is not available in this agent.",
+    },
+    {
+      role: "tool_result",
+      callId: "call_2",
+      content: "Tool 'math' is not available in this agent.",
+    },
+  ]);
   expect(context.messages.map((message) => message.role)).toEqual([
     "user",
     "assistant",
+    "tool_result",
     "tool_result",
     "assistant",
   ]);
@@ -96,6 +123,14 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
     { type: "reasoning_summary", text: "Need a tool." },
     { type: "text", text: "Checking..." },
     { type: "tool_call", raw: { callId: "call_1", name: "bash", input: {} } },
+    {
+      type: "tool_call",
+      raw: {
+        callId: "call_2",
+        name: "math",
+        input: { operation: "add", left: 2, right: 3 },
+      },
+    },
   ]);
 });
 
