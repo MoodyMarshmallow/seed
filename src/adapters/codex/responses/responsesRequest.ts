@@ -6,7 +6,7 @@ export function buildCodexResponsesBody(
   return {
     ...request.settings.responseOverrides,
     model: request.settings.model,
-    instructions: request.systemPrompt,
+    instructions: request.prefix.systemPrompt,
     store: false,
     reasoning: request.settings.reasoning,
     input: request.messages.map((message) => {
@@ -35,7 +35,7 @@ export function buildCodexResponsesBody(
         ],
       };
     }),
-    tools: request.tools.map((tool) => ({
+    tools: request.prefix.tools.map((tool) => ({
       type: "function",
       name: tool.name,
       description: tool.description,

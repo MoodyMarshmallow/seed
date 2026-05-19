@@ -91,6 +91,10 @@ test("agent turn persists user, assistant, reasoning summary, and missing tool r
     "completed",
   ]);
   expect(model.requests).toHaveLength(2);
+  expect(model.requests[0]?.prefix).toEqual({
+    systemPrompt: "Be direct.",
+    tools: [],
+  });
   expect(model.requests[1]?.messages).toEqual([
     { role: "user", content: "Please inspect." },
     { role: "assistant", content: "Checking..." },

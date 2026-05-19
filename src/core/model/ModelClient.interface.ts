@@ -18,11 +18,15 @@ export type ModelMessageInput =
       readonly content: string;
     };
 
-export interface ModelRequest {
+interface ModelRequestPrefix {
   readonly systemPrompt: string;
+  readonly tools: readonly ToolDefinition[];
+}
+
+export interface ModelRequest {
+  readonly prefix: ModelRequestPrefix;
   readonly settings: ResponseSettings;
   readonly messages: readonly ModelMessageInput[];
-  readonly tools: readonly ToolDefinition[];
 }
 
 export type ModelStreamEvent =

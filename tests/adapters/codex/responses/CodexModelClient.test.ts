@@ -53,14 +53,13 @@ test("Codex model client streams text, reasoning summaries, tool calls, and comp
 
   const events = [];
   for await (const event of model.stream({
-    systemPrompt: "Be useful.",
+    prefix: { systemPrompt: "Be useful.", tools: [] },
     settings: {
       model: "gpt-5.1",
       reasoning: { effort: "medium", summary: "auto" },
       responseOverrides: { parallel_tool_calls: false },
     },
     messages: [{ role: "user", content: "Hi" }],
-    tools: [],
   })) {
     events.push(event);
   }
@@ -108,14 +107,13 @@ test("Codex model client includes response error details when the backend reject
 
   await expect(async () => {
     for await (const _event of model.stream({
-      systemPrompt: "Be useful.",
+      prefix: { systemPrompt: "Be useful.", tools: [] },
       settings: {
         model: "gpt-5.5",
         reasoning: { effort: "medium", summary: "auto" },
         responseOverrides: {},
       },
       messages: [{ role: "user", content: "Hi" }],
-      tools: [],
     })) {
       // consume stream
     }
@@ -136,7 +134,7 @@ test("Codex model client replays tool calls before their outputs", async () => {
   });
 
   for await (const _event of model.stream({
-    systemPrompt: "Be useful.",
+    prefix: { systemPrompt: "Be useful.", tools: [] },
     settings: {
       model: "gpt-5.5",
       reasoning: { effort: "medium", summary: "auto" },
@@ -160,7 +158,6 @@ test("Codex model client replays tool calls before their outputs", async () => {
       { role: "tool_result", callId: "call_1", content: "3" },
       { role: "tool_result", callId: "call_2", content: "35" },
     ],
-    tools: [],
   })) {
     // consume stream
   }

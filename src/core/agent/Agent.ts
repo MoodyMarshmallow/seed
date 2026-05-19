@@ -74,10 +74,12 @@ export class Agent {
     const assistantContentBlocks: AssistantContentBlock[] = [];
 
     for await (const event of this.#model.stream({
-      systemPrompt: context.systemPrompt,
+      prefix: {
+        systemPrompt: context.systemPrompt,
+        tools,
+      },
       settings: context.settings,
       messages: context.messages,
-      tools,
     })) {
       switch (event.type) {
         case "reasoning_summary.delta":
