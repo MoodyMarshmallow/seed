@@ -10,10 +10,22 @@
 - **Feature module**: Runtime behavior or orchestration code, such as the Agent, ConversationManager, config loader, or CLI harness.
 - **Conversation**: A user-facing chat history that can be resumed, displayed, and extended.
 - **Memory**: The agent-facing module that prepares model context and records conversation events. The Agent must not depend on JSONL or another concrete conversation implementation directly.
-- **Initial context**: The system prompt and initial settings used when a conversation is created.
+- **Agent defaults**: The current system prompt, Settings, and tool catalog supplied to the Agent runtime as standard agent inputs, without requiring them to be collapsed into one core module.
 - **Settings**: Latest model settings for a conversation.
+- **Tool catalog**: The tools available to the Agent, including their names, descriptions, and input schemas.
 - **CLI harness**: The runnable command used for local E2E development, not the stable downstream product interface.
+- **KV cache optimization**: A core design goal of preserving stable model request prefixes across turns so model providers can reuse cached attention state.
 
 ## Architectural Intent
 
 Keep the core library modular and dependency-injected. Concrete file stores and the Codex model client exist to make the template runnable, but downstream projects should be able to replace them without changing agent orchestration.
+
+Core interfaces should support KV cache optimization as much as possible without over-specifying provider behavior or reducing adapter flexibility.
+
+When a Conversation is resumed, core should explicitly decide how current Agent defaults are applied rather than leaving that behavior to adapters.
+
+Resumed Conversation sync policy belongs in Conversation lifecycle core modules, not in the CLI harness, Agent turn orchestration, or Memory adapters.
+
+Every path that makes an existing Conversation active should share one Conversation activation flow so current system prompt and Settings are applied consistently.
+
+Core should treat the tool catalog as structured Agent defaults. Model client adapters remain responsible for serializing tools through each provider's dedicated tool protocol rather than treating tools as ordinary prompt text.

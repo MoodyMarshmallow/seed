@@ -1,0 +1,3 @@
+# Sync Agent Defaults On Resume
+
+When an existing Conversation becomes active, Conversation lifecycle core modules will apply the current system prompt and Settings instead of permanently pinning those values from Conversation creation. Auto-resume and manual selection should share one activation flow so this policy is consistent. The tool catalog remains runtime state supplied through the model interface rather than persisted Conversation state. This deliberately favors the user expectation that edits to agent configuration or available tools affect the next resumed session, while accepting the small KV cache optimization cost when those inputs rarely change.
