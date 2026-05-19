@@ -18,7 +18,9 @@ export type ReasoningSettings = z.infer<typeof reasoningSettingsSchema>;
 export type AgentConfig = z.infer<typeof agentConfigSchema>;
 
 /**
- * Loads initial Agent defaults from a concrete configuration source.
+ * Loads Agent defaults from a concrete configuration source.
+ * Implementations must validate external input before returning it and supply a
+ * complete config shape, including defaulted response overrides.
  */
 export interface AgentConfigStore {
   /**

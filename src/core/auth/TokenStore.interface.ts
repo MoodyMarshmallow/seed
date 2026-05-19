@@ -1,3 +1,8 @@
+/**
+ * Persisted Codex OAuth token state.
+ * Implementations must treat tokens as sensitive data, preserve expiry metadata
+ * exactly, and allow nullable account metadata when the provider omits it.
+ */
 export interface CodexTokenRecord {
   readonly accessToken: string;
   readonly refreshToken: string;
@@ -10,6 +15,8 @@ export interface CodexTokenRecord {
 
 /**
  * Persistence interface for Codex subscription auth tokens.
+ * Implementations must make writes visible to later reads, return `null` when
+ * no token is stored, and make `clear` idempotent.
  */
 export interface TokenStore {
   /**

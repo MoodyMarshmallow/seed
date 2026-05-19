@@ -23,6 +23,12 @@ interface ModelRequestPrefix {
   readonly tools: readonly ToolDefinition[];
 }
 
+/**
+ * Complete model request assembled by core for one model pass.
+ * Implementations must preserve the semantic split between stable `prefix`
+ * content and replay `messages` so adapters can optimize provider requests
+ * without changing Agent behavior.
+ */
 export interface ModelRequest {
   readonly prefix: ModelRequestPrefix;
   readonly settings: ResponseSettings;
@@ -51,7 +57,10 @@ export type ModelStreamEvent =
   | { readonly type: "failed"; readonly error: string; readonly raw: unknown };
 
 /**
- * Streams normalized model response events.
+ * Streams normalized model response events for a provider.
+ * Implementations must translate `ModelRequest` into the provider protocol,
+ * yield events in provider/model order, preserve tool call identifiers, and
+ * either yield a terminal event or throw a transport/protocol error.
  */
 export interface ModelClient {
   /**

@@ -22,6 +22,7 @@ Always use the `tdd` skill for code changes. Follow TDD best practices:
 - Refactor only after tests are green.
 - Prefer tests through public interfaces and real seams rather than implementation details.
 - Add regression tests for bugs before fixing them when a correct seam exists.
+- When exporting a new interface, add a docstring that explains what implementations should do and the invariants they must uphold.
 - Run `bun run lint`, `bun run typecheck`, `bun run test`, and `bun run knip` before considering work complete.
 
 ## Agent skills

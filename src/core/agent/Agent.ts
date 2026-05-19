@@ -7,12 +7,23 @@ import type { ToolCallRequest } from "../tools/Tool.interface";
 import type { ToolRegistry } from "../tools/ToolRegistry";
 import type { AgentTurnEvent } from "./events";
 
+/**
+ * Runtime seams required by the Agent orchestrator.
+ * Callers must provide dependencies for the same Agent runtime: Memory for the
+ * target Conversations, a model client that accepts core model requests, and a
+ * tool registry containing the tools exposed to that model client.
+ */
 export interface AgentDependencies {
   readonly memory: AgentMemory;
   readonly model: ModelClient;
   readonly tools: ToolRegistry;
 }
 
+/**
+ * User input for one Agent turn.
+ * `conversationId` must reference a Conversation visible to Memory, and
+ * `userMessage` is recorded before any model request is started.
+ */
 export interface RunTurnInput {
   readonly conversationId: string;
   readonly userMessage: string;

@@ -2,6 +2,8 @@ import type { ConversationRecord, ConversationSummary } from "./entries";
 
 /**
  * Stores complete conversation records.
+ * Implementations must preserve Conversation ids, turn order, header Settings,
+ * and open-turn lifecycle invariants across create/read/write/list calls.
  */
 export interface ConversationStore {
   /**

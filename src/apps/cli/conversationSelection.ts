@@ -10,6 +10,11 @@ type ConversationSelectionManager = Pick<
   "listConversations" | "createConversation" | "activateConversation"
 >;
 
+/**
+ * User interaction seam for selecting an initial Conversation in the CLI.
+ * Implementations must present prompts and writes in order and resolve each
+ * question with exactly the user input that should be parsed by selection code.
+ */
 export interface ConversationSelectionIo {
   readonly question: (prompt: string) => Promise<string>;
   readonly write: (text: string) => void;

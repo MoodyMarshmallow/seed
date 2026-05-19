@@ -39,6 +39,9 @@ export type MemoryRecord =
 
 /**
  * Prepares model context and records conversation events.
+ * Implementations must make recorded events visible to later `prepareTurn`
+ * calls, exclude raw reasoning from replayable messages, and preserve tool call
+ * / tool result correlation needed by model adapters.
  */
 export interface AgentMemory {
   /**

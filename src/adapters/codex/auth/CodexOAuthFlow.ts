@@ -4,6 +4,12 @@ import { type Server, createServer } from "node:http";
 const OPENAI_AUTH_ISSUER = "https://auth.openai.com";
 const CODEX_CLIENT_ID = "app_EMoamEEZ73f0CkXaXp7hrann";
 
+/**
+ * Active Codex OAuth login attempt.
+ * Implementations must keep the verifier paired with the generated auth URL,
+ * resolve `waitForCode` once with the callback code, and make `cancel`
+ * idempotently release any local listener resources.
+ */
 export interface CodexOAuthLogin {
   readonly loginId: string;
   readonly authUrl: string;
@@ -13,6 +19,11 @@ export interface CodexOAuthLogin {
   readonly cancel: () => Promise<void>;
 }
 
+/**
+ * Local callback settings for Codex OAuth.
+ * Implementations must use these values only to configure the local listener;
+ * omitted fields should fall back to safe defaults for local development.
+ */
 export interface CodexOAuthFlowOptions {
   readonly callbackHost?: string;
   readonly callbackPort?: number;

@@ -21,6 +21,12 @@ interface CreateConversationInput extends ResponseSettings {
   readonly systemPrompt: string;
 }
 
+/**
+ * Conversation identity returned after creation or activation.
+ * Implementations must return an `id` that can be used with Conversation core
+ * methods and a `filePath` that points to the concrete persisted record when a
+ * file-backed store is used.
+ */
 export interface CreatedConversation {
   readonly id: string;
   readonly filePath: string;
