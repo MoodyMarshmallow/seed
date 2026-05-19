@@ -7,7 +7,7 @@ import type { ConversationSummary } from "../../core/conversations/entries";
 
 type ConversationSelectionManager = Pick<
   ConversationManager,
-  "listConversations" | "createConversation"
+  "listConversations" | "createConversation" | "activateConversation"
 >;
 
 export interface ConversationSelectionIo {
@@ -83,10 +83,10 @@ export async function selectInitialConversation(dependencies: {
       );
       continue;
     }
-    return {
-      id: selected.id,
-      filePath: selected.filePath,
-    };
+    return dependencies.conversations.activateConversation(
+      selected.id,
+      dependencies.config,
+    );
   }
 }
 

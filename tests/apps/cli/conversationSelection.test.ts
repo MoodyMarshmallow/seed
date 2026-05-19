@@ -41,7 +41,7 @@ test("resolves numbered conversation selections", () => {
   expect(resolveConversationSelection("nope", 2)).toBeNull();
 });
 
-test("selects an existing conversation by number without requiring users to remember IDs", async () => {
+test("selects and activates an existing conversation by number without requiring users to remember IDs", async () => {
   const writes: string[] = [];
   const conversation = await selectInitialConversation({
     config,
@@ -56,6 +56,14 @@ test("selects an existing conversation by number without requiring users to reme
       ],
       createConversation: async () => {
         throw new Error("should not create");
+      },
+      activateConversation: async (conversationId, input) => {
+        expect(conversationId).toBe("conversation_1");
+        expect(input).toEqual(config);
+        return {
+          id: conversationId,
+          filePath: "/tmp/conversation_1.jsonl",
+        };
       },
     },
     io: {

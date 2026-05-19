@@ -67,9 +67,40 @@ export class ConversationManager {
   ): Promise<CreatedConversation> {
     const [recent] = await this.#store.list();
     if (recent) {
-      return { id: recent.id, filePath: recent.filePath };
+      return this.activateConversation(recent.id, input);
     }
     return this.createConversation(input);
+  }
+
+  async activateConversation(
+    conversationId: string,
+    input: CreateConversationInput,
+  ): Promise<CreatedConversation> {
+    const conversationRecord = await this.#store.read(conversationId);
+    await this.#store.write({
+      ...conversationRecord,
+      header: {
+        ...conversationRecord.header,
+        updatedAt: nowIso(),
+        systemPrompt: input.systemPrompt,
+        settings: {
+          model: input.model,
+          reasoning: input.reasoning,
+          responseOverrides: input.responseOverrides,
+        },
+      },
+    });
+
+    const activated = (await this.#store.list()).find(
+      (conversation) => conversation.id === conversationId,
+    );
+    if (!activated) {
+      throw new AgentError({
+        code: "conversation_invalid",
+        message: `Conversation '${conversationId}' is not available.`,
+      });
+    }
+    return { id: activated.id, filePath: activated.filePath };
   }
 
   async recordMessage(

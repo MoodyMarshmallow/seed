@@ -57,6 +57,50 @@ test("conversations keep latest settings and undo removes the latest turn from r
   ]);
 });
 
+test("activating a conversation applies current system prompt and settings", async () => {
+  const cwd = await mkdtemp(join(tmpdir(), "agent-conversation-"));
+  const conversations = new ConversationManager({
+    cwd,
+    store: new JsonlConversationStore({
+      rootDir: join(cwd, ".agent", "conversations"),
+    }),
+  });
+  const conversation = await conversations.createConversation({
+    systemPrompt: "Old prompt.",
+    model: "gpt-5.1",
+    reasoning: { effort: "medium", summary: "auto" },
+    responseOverrides: { temperature: 0.1 },
+  });
+  await conversations.recordMessage(conversation.id, {
+    role: "user",
+    content: [{ type: "text", text: "Keep this." }],
+  });
+  await conversations.recordMessage(conversation.id, {
+    role: "assistant",
+    content: [{ type: "text", text: "Kept." }],
+  });
+
+  const activated = await conversations.activateConversation(conversation.id, {
+    systemPrompt: "Current prompt.",
+    model: "gpt-5.5",
+    reasoning: { effort: "low", summary: "auto" },
+    responseOverrides: {},
+  });
+  const context = await conversations.buildContext(conversation.id);
+
+  expect(activated).toEqual(conversation);
+  expect(context.systemPrompt).toBe("Current prompt.");
+  expect(context.settings).toEqual({
+    model: "gpt-5.5",
+    reasoning: { effort: "low", summary: "auto" },
+    responseOverrides: {},
+  });
+  expect(context.messages.map((message) => message.role)).toEqual([
+    "user",
+    "assistant",
+  ]);
+});
+
 test("conversations allow only one open turn", async () => {
   const cwd = await mkdtemp(join(tmpdir(), "agent-conversation-"));
   const conversations = new ConversationManager({
