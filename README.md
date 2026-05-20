@@ -58,7 +58,7 @@ Interfaces that extend the core are:
 - `TokenStore.interface.ts` for local auth token persistence.
 - `Tool.interface.ts` for executable model tools.
 
-### Extensible Parts
+### Demo Parts
 
 ```text
 src/
@@ -66,7 +66,7 @@ src/
   apps/cli/       Thin runnable harness that composes core + adapters
 ```
 
-Included extensible implementations are:
+Included demo implementations are:
 
 - `SimpleLinearMemory` is a placeholder `AgentMemory` implementation backed by one linear conversation timeline.
 - `JsonAgentConfigStore` loads and validates `agent.config.json`.
