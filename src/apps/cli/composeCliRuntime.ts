@@ -1,16 +1,16 @@
 import { join } from "node:path";
 
-import { CodexAuthClient } from "../adapters/codex/auth/CodexAuthClient";
-import { CodexOAuthFlow } from "../adapters/codex/auth/CodexOAuthFlow";
-import { CodexModelClient } from "../adapters/codex/responses/CodexModelClient";
-import { JsonAgentConfigStore } from "../adapters/file-system/JsonAgentConfigStore";
-import { JsonFileTokenStore } from "../adapters/file-system/JsonFileTokenStore";
-import { JsonlConversationStore } from "../adapters/file-system/JsonlConversationStore";
-import { SimpleLinearMemory } from "../adapters/memory/simple-linear/SimpleLinearMemory";
-import { MathTool } from "../adapters/tools/MathTool";
-import { Agent } from "../core/agent/Agent";
-import { ConversationManager } from "../core/conversations/ConversationManager";
-import { ToolRegistry } from "../core/tools/ToolRegistry";
+import { CodexAuthClient } from "../../adapters/codex/auth/CodexAuthClient";
+import { CodexOAuthFlow } from "../../adapters/codex/auth/CodexOAuthFlow";
+import { CodexModelClient } from "../../adapters/codex/responses/CodexModelClient";
+import { JsonAgentConfigStore } from "../../adapters/file-system/JsonAgentConfigStore";
+import { JsonFileTokenStore } from "../../adapters/file-system/JsonFileTokenStore";
+import { JsonlConversationStore } from "../../adapters/file-system/JsonlConversationStore";
+import { SimpleLinearMemory } from "../../adapters/memory/simple-linear/SimpleLinearMemory";
+import { MathTool } from "../../adapters/tools/MathTool";
+import { Agent } from "../../core/agent/Agent";
+import { ConversationManager } from "../../core/conversations/ConversationManager";
+import { ToolRegistry } from "../../core/tools/ToolRegistry";
 import type { CliRuntime } from "./CliRuntime.interface";
 import { ensureRuntimeAuth } from "./auth";
 import { createSettingsUpdater } from "./createSettingsUpdater";

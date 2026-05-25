@@ -1,15 +1,15 @@
-import type { AgentTurnEvent } from "../core/agent/events";
-import type { AgentConfig } from "../core/config/AgentConfig.schema";
+import type { AgentTurnEvent } from "../../core/agent/events";
+import type { AgentConfig } from "../../core/config/AgentConfig.schema";
 import type {
   ConversationMessage,
   ConversationSummary,
-} from "../core/conversations/ConversationRecord.interface";
+} from "../../core/conversations/ConversationRecord.interface";
 import type {
   ConversationContextReader,
   ConversationLifecycle,
   CreatedConversation,
-} from "../core/conversations/ConversationRuntime.interface";
-import type { ResponseSettings } from "../core/settings/ResponseSettings.interface";
+} from "../../core/conversations/ConversationRuntime.interface";
+import type { ResponseSettings } from "../../core/settings/ResponseSettings.interface";
 
 export type CliAgentConfig = AgentConfig;
 export type CliConversationMessage = ConversationMessage;

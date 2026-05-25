@@ -22,12 +22,29 @@ strict digraph "dependency-cruiser output"{
     "src/adapters/file-system/JsonlConversationStore.ts" -> "src/core/errors/AgentError.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/adapters" {label="adapters" subgraph "cluster_src/adapters/memory" {label="memory" subgraph "cluster_src/adapters/memory/simple-linear" {label="simple-linear" "src/adapters/memory/simple-linear/SimpleLinearMemory.ts" [label=<SimpleLinearMemory.ts> tooltip="SimpleLinearMemory.ts" URL="src/adapters/memory/simple-linear/SimpleLinearMemory.ts" fillcolor="#ddfeff"] } } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/adapters" {label="adapters" subgraph "cluster_src/adapters/tools" {label="tools" "src/adapters/tools/MathTool.ts" [label=<MathTool.ts> tooltip="MathTool.ts" URL="src/adapters/tools/MathTool.ts" fillcolor="#ddfeff"] } } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/CliRuntime.interface.ts" [label=<CliRuntime.interface.ts> tooltip="CliRuntime.interface.ts" URL="src/apps/cli/CliRuntime.interface.ts" fillcolor="#ccffcc"] } } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/auth.ts" [label=<auth.ts> tooltip="auth.ts" URL="src/apps/cli/auth.ts" fillcolor="#ddfeff"] } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/commands.ts" [label=<commands.ts> tooltip="commands.ts" URL="src/apps/cli/commands.ts" fillcolor="#ddfeff"] } } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/composeCliRuntime.ts" [label=<composeCliRuntime.ts> tooltip="composeCliRuntime.ts" URL="src/apps/cli/composeCliRuntime.ts" fillcolor="#ddfeff"] } } }
+    "src/apps/cli/composeCliRuntime.ts" -> "src/adapters/codex/auth/CodexAuthClient.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/adapters/codex/auth/CodexOAuthFlow.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/adapters/codex/responses/CodexModelClient.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/adapters/file-system/JsonAgentConfigStore.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/adapters/file-system/JsonFileTokenStore.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/adapters/file-system/JsonlConversationStore.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/adapters/memory/simple-linear/SimpleLinearMemory.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/adapters/tools/MathTool.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/core/agent/Agent.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/core/conversations/ConversationManager.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/core/tools/ToolRegistry.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/apps/cli/auth.ts"
+    "src/apps/cli/composeCliRuntime.ts" -> "src/apps/cli/createSettingsUpdater.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/conversationHistory.ts" [label=<conversationHistory.ts> tooltip="conversationHistory.ts" URL="src/apps/cli/conversationHistory.ts" fillcolor="#ddfeff"] } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/conversationSelection.ts" [label=<conversationSelection.ts> tooltip="conversationSelection.ts" URL="src/apps/cli/conversationSelection.ts" fillcolor="#ddfeff"] } } }
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/createSettingsUpdater.ts" [label=<createSettingsUpdater.ts> tooltip="createSettingsUpdater.ts" URL="src/apps/cli/createSettingsUpdater.ts" fillcolor="#ddfeff"] } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/main.ts" [label=<main.ts> tooltip="main.ts" URL="src/apps/cli/main.ts" fillcolor="#ddfeff"] } } }
-    "src/apps/cli/main.ts" -> "src/runtime/composeCliRuntime.ts"
     "src/apps/cli/main.ts" -> "src/apps/cli/commands.ts"
+    "src/apps/cli/main.ts" -> "src/apps/cli/composeCliRuntime.ts"
     "src/apps/cli/main.ts" -> "src/apps/cli/conversationHistory.ts"
     "src/apps/cli/main.ts" -> "src/apps/cli/conversationSelection.ts"
     "src/apps/cli/main.ts" -> "src/apps/cli/readline.ts"
@@ -57,21 +74,4 @@ strict digraph "dependency-cruiser output"{
     subgraph "cluster_src" {label="src" subgraph "cluster_src/core" {label="core" subgraph "cluster_src/core/tools" {label="tools" "src/core/tools/ToolRegistry.ts" [label=<ToolRegistry.ts> tooltip="ToolRegistry.ts" URL="src/core/tools/ToolRegistry.ts" fillcolor="#ddfeff"] } } }
     "src/core/tools/ToolRegistry.ts" -> "src/core/errors/AgentError.ts"
     subgraph "cluster_src" {label="src" subgraph "cluster_src/core" {label="core" subgraph "cluster_src/core/tools" {label="tools" "src/core/tools/ToolRuntime.interface.ts" [label=<ToolRuntime.interface.ts> tooltip="ToolRuntime.interface.ts" URL="src/core/tools/ToolRuntime.interface.ts" fillcolor="#ccffcc"] } } }
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/runtime" {label="runtime" "src/runtime/CliRuntime.interface.ts" [label=<CliRuntime.interface.ts> tooltip="CliRuntime.interface.ts" URL="src/runtime/CliRuntime.interface.ts" fillcolor="#ccffcc"] } }
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/runtime" {label="runtime" "src/runtime/auth.ts" [label=<auth.ts> tooltip="auth.ts" URL="src/runtime/auth.ts" fillcolor="#ddfeff"] } }
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/runtime" {label="runtime" "src/runtime/composeCliRuntime.ts" [label=<composeCliRuntime.ts> tooltip="composeCliRuntime.ts" URL="src/runtime/composeCliRuntime.ts" fillcolor="#ddfeff"] } }
-    "src/runtime/composeCliRuntime.ts" -> "src/adapters/codex/auth/CodexAuthClient.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/adapters/codex/auth/CodexOAuthFlow.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/adapters/codex/responses/CodexModelClient.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/adapters/file-system/JsonAgentConfigStore.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/adapters/file-system/JsonFileTokenStore.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/adapters/file-system/JsonlConversationStore.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/adapters/memory/simple-linear/SimpleLinearMemory.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/adapters/tools/MathTool.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/core/agent/Agent.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/core/conversations/ConversationManager.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/core/tools/ToolRegistry.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/runtime/auth.ts"
-    "src/runtime/composeCliRuntime.ts" -> "src/runtime/createSettingsUpdater.ts"
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/runtime" {label="runtime" "src/runtime/createSettingsUpdater.ts" [label=<createSettingsUpdater.ts> tooltip="createSettingsUpdater.ts" URL="src/runtime/createSettingsUpdater.ts" fillcolor="#ddfeff"] } }
 }

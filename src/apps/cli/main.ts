@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
-import { composeCliRuntime } from "../../runtime/composeCliRuntime";
 import { applyCliSettingsCommand, helpText } from "./commands";
+import { composeCliRuntime } from "./composeCliRuntime";
 import { renderConversationHistory } from "./conversationHistory";
 import { selectInitialConversation } from "./conversationSelection";
 import { createCliReadline } from "./readline";

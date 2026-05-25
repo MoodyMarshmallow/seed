@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { CliResponseSettings } from "../../runtime/CliRuntime.interface";
+import type { CliResponseSettings } from "./CliRuntime.interface";
 
 const jsonObjectSchema = z.record(z.string(), z.unknown());
 

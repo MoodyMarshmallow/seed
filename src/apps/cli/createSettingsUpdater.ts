@@ -1,4 +1,4 @@
-import type { AgentMemory } from "../core/memory/AgentMemory.interface";
+import type { AgentMemory } from "../../core/memory/AgentMemory.interface";
 import type { CliRuntime } from "./CliRuntime.interface";
 
 export function createSettingsUpdater(

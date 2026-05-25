@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 
-import type { OAuthFlow } from "../core/auth/OAuthFlow.interface";
-import type { TokenStore } from "../core/auth/TokenStore.interface";
+import type { OAuthFlow } from "../../core/auth/OAuthFlow.interface";
+import type { TokenStore } from "../../core/auth/TokenStore.interface";
 
 interface EnsureRuntimeAuthOptions {
   readonly tokenStore: TokenStore;

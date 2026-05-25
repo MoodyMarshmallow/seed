@@ -1,7 +1,7 @@
 import type {
   CliConversationMessage,
   CliConversations,
-} from "../../runtime/CliRuntime.interface";
+} from "./CliRuntime.interface";
 
 /** Renders previous messages for a resumed conversation. */
 export async function renderConversationHistory(

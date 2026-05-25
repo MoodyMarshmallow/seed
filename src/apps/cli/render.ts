@@ -1,4 +1,4 @@
-import type { CliTurnEvent } from "../../runtime/CliRuntime.interface";
+import type { CliTurnEvent } from "./CliRuntime.interface";
 
 export class CliTurnRenderer {
   #inlineBlock: "reasoning" | "text" | null = null;

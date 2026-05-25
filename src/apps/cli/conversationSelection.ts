@@ -3,7 +3,7 @@ import type {
   CliConversationSummary,
   CliConversations,
   CliCreatedConversation,
-} from "../../runtime/CliRuntime.interface";
+} from "./CliRuntime.interface";
 
 type ConversationSelectionManager = Pick<
   CliConversations,

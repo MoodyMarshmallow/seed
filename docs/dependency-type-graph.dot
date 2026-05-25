@@ -26,16 +26,30 @@ strict digraph "dependency-cruiser output"{
     "src/adapters/memory/simple-linear/SimpleLinearMemory.ts" -> "src/core/model/ModelClient.interface.ts" [arrowhead="onormal" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/adapters" {label="adapters" subgraph "cluster_src/adapters/tools" {label="tools" "src/adapters/tools/MathTool.ts" [label=<MathTool.ts> tooltip="MathTool.ts" URL="src/adapters/tools/MathTool.ts" fillcolor="#ddfeff"] } } }
     "src/adapters/tools/MathTool.ts" -> "src/core/tools/Tool.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/CliRuntime.interface.ts" [label=<CliRuntime.interface.ts> tooltip="CliRuntime.interface.ts" URL="src/apps/cli/CliRuntime.interface.ts" fillcolor="#ccffcc"] } } }
+    "src/apps/cli/CliRuntime.interface.ts" -> "src/core/agent/events.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/CliRuntime.interface.ts" -> "src/core/config/AgentConfig.schema.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/CliRuntime.interface.ts" -> "src/core/conversations/ConversationRecord.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/CliRuntime.interface.ts" -> "src/core/conversations/ConversationRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/CliRuntime.interface.ts" -> "src/core/settings/ResponseSettings.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/auth.ts" [label=<auth.ts> tooltip="auth.ts" URL="src/apps/cli/auth.ts" fillcolor="#ddfeff"] } } }
+    "src/apps/cli/auth.ts" -> "src/core/auth/OAuthFlow.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/auth.ts" -> "src/core/auth/TokenStore.interface.ts" [arrowhead="onormal" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/commands.ts" [label=<commands.ts> tooltip="commands.ts" URL="src/apps/cli/commands.ts" fillcolor="#ddfeff"] } } }
-    "src/apps/cli/commands.ts" -> "src/runtime/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/commands.ts" -> "src/apps/cli/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/composeCliRuntime.ts" [label=<composeCliRuntime.ts> tooltip="composeCliRuntime.ts" URL="src/apps/cli/composeCliRuntime.ts" fillcolor="#ddfeff"] } } }
+    "src/apps/cli/composeCliRuntime.ts" -> "src/apps/cli/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/conversationHistory.ts" [label=<conversationHistory.ts> tooltip="conversationHistory.ts" URL="src/apps/cli/conversationHistory.ts" fillcolor="#ddfeff"] } } }
-    "src/apps/cli/conversationHistory.ts" -> "src/runtime/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/conversationHistory.ts" -> "src/apps/cli/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/conversationSelection.ts" [label=<conversationSelection.ts> tooltip="conversationSelection.ts" URL="src/apps/cli/conversationSelection.ts" fillcolor="#ddfeff"] } } }
-    "src/apps/cli/conversationSelection.ts" -> "src/runtime/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/conversationSelection.ts" -> "src/apps/cli/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/createSettingsUpdater.ts" [label=<createSettingsUpdater.ts> tooltip="createSettingsUpdater.ts" URL="src/apps/cli/createSettingsUpdater.ts" fillcolor="#ddfeff"] } } }
+    "src/apps/cli/createSettingsUpdater.ts" -> "src/core/memory/AgentMemory.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/createSettingsUpdater.ts" -> "src/apps/cli/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/main.ts" [label=<main.ts> tooltip="main.ts" URL="src/apps/cli/main.ts" fillcolor="#ddfeff"] } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/readline.ts" [label=<readline.ts> tooltip="readline.ts" URL="src/apps/cli/readline.ts" fillcolor="#ddfeff"] } } }
     subgraph "cluster_src" {label="src" subgraph "cluster_src/apps" {label="apps" subgraph "cluster_src/apps/cli" {label="cli" "src/apps/cli/render.ts" [label=<render.ts> tooltip="render.ts" URL="src/apps/cli/render.ts" fillcolor="#ddfeff"] } } }
-    "src/apps/cli/render.ts" -> "src/runtime/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
+    "src/apps/cli/render.ts" -> "src/apps/cli/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/core" {label="core" subgraph "cluster_src/core/agent" {label="agent" "src/core/agent/Agent.ts" [label=<Agent.ts> tooltip="Agent.ts" URL="src/core/agent/Agent.ts" fillcolor="#ddfeff"] } } }
     "src/core/agent/Agent.ts" -> "src/core/memory/AgentMemory.interface.ts" [arrowhead="onormal" penwidth="1.0"]
     "src/core/agent/Agent.ts" -> "src/core/model/ModelClient.interface.ts" [arrowhead="onormal" penwidth="1.0"]
@@ -78,18 +92,4 @@ strict digraph "dependency-cruiser output"{
     "src/core/tools/ToolRegistry.ts" -> "src/core/tools/ToolRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
     subgraph "cluster_src" {label="src" subgraph "cluster_src/core" {label="core" subgraph "cluster_src/core/tools" {label="tools" "src/core/tools/ToolRuntime.interface.ts" [label=<ToolRuntime.interface.ts> tooltip="ToolRuntime.interface.ts" URL="src/core/tools/ToolRuntime.interface.ts" fillcolor="#ccffcc"] } } }
     "src/core/tools/ToolRuntime.interface.ts" -> "src/core/tools/Tool.interface.ts" [arrowhead="onormal" penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/runtime" {label="runtime" "src/runtime/CliRuntime.interface.ts" [label=<CliRuntime.interface.ts> tooltip="CliRuntime.interface.ts" URL="src/runtime/CliRuntime.interface.ts" fillcolor="#ccffcc"] } }
-    "src/runtime/CliRuntime.interface.ts" -> "src/core/agent/events.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/runtime/CliRuntime.interface.ts" -> "src/core/config/AgentConfig.schema.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/runtime/CliRuntime.interface.ts" -> "src/core/conversations/ConversationRecord.interface.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/runtime/CliRuntime.interface.ts" -> "src/core/conversations/ConversationRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/runtime/CliRuntime.interface.ts" -> "src/core/settings/ResponseSettings.interface.ts" [arrowhead="onormal" penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/runtime" {label="runtime" "src/runtime/auth.ts" [label=<auth.ts> tooltip="auth.ts" URL="src/runtime/auth.ts" fillcolor="#ddfeff"] } }
-    "src/runtime/auth.ts" -> "src/core/auth/OAuthFlow.interface.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/runtime/auth.ts" -> "src/core/auth/TokenStore.interface.ts" [arrowhead="onormal" penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/runtime" {label="runtime" "src/runtime/composeCliRuntime.ts" [label=<composeCliRuntime.ts> tooltip="composeCliRuntime.ts" URL="src/runtime/composeCliRuntime.ts" fillcolor="#ddfeff"] } }
-    "src/runtime/composeCliRuntime.ts" -> "src/runtime/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
-    subgraph "cluster_src" {label="src" subgraph "cluster_src/runtime" {label="runtime" "src/runtime/createSettingsUpdater.ts" [label=<createSettingsUpdater.ts> tooltip="createSettingsUpdater.ts" URL="src/runtime/createSettingsUpdater.ts" fillcolor="#ddfeff"] } }
-    "src/runtime/createSettingsUpdater.ts" -> "src/core/memory/AgentMemory.interface.ts" [arrowhead="onormal" penwidth="1.0"]
-    "src/runtime/createSettingsUpdater.ts" -> "src/runtime/CliRuntime.interface.ts" [arrowhead="onormal" penwidth="1.0"]
 }

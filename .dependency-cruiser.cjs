@@ -9,9 +9,11 @@ module.exports = {
       },
     },
     {
-      name: "apps-use-public-runtime-only",
+      name: "cli-presentation-uses-cli-seams-only",
       severity: "error",
-      from: { path: "^src/apps" },
+      from: {
+        path: "^src/apps/cli/(?!CliRuntime\\.interface\\.ts$)(?!auth\\.ts$)(?!composeCliRuntime\\.ts$)(?!createSettingsUpdater\\.ts$)",
+      },
       to: { path: "^src/(core|adapters)/" },
     },
     {
