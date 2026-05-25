@@ -10,7 +10,7 @@
     "agent": "bun run src/apps/cli/main.ts",
     "arch:deps": "depcruise src --config .dependency-cruiser.cjs --include-only \"^src\"",
     "fmt": "biome format --write .",
-    "graph:deps": "depcruise src --config .dependency-cruiser.graph.cjs --include-only \"^src\" --output-type dot --output-to docs/dependency-runtime-graph.dot && dot -Tsvg docs/dependency-runtime-graph.dot -o docs/dependency-runtime-graph.svg && depcruise src --config .dependency-cruiser.cjs --include-only \"^src\" --output-type dot --output-to docs/dependency-type-graph.full.dot && bun scripts/filter-type-only-dot.mjs docs/dependency-type-graph.full.dot docs/dependency-type-graph.dot && rm docs/dependency-type-graph.full.dot && dot -Tsvg docs/dependency-type-graph.dot -o docs/dependency-type-graph.svg",
+    "graph:deps": "bun scripts/regenerate-dependency-graphs.mts",
     "knip": "knip",
     "lint": "biome check .",
     "lsp:typescript": "typescript-language-server --stdio",

@@ -16,5 +16,10 @@
     "skipLibCheck": true,
     "types": ["bun-types", "vitest/globals", "node"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "vitest.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "scripts/**/*.mts",
+    "vitest.config.ts"
+  ]
 }

@@ -1,18 +1,20 @@
 import { readFile, writeFile } from "node:fs/promises";
 
-const [, , inputPath, outputPath] = process.argv;
+const inputPath = process.argv[2];
+const outputPath = process.argv[3];
 
 if (!inputPath || !outputPath) {
-  throw new Error("Usage: filter-type-only-dot.mjs <input.dot> <output.dot>");
+  throw new Error("Usage: filter-type-only-dot.mts <input.dot> <output.dot>");
 }
 
 const input = await readFile(inputPath, "utf8");
 const output = input
   .split("\n")
   .filter(
-    (line) => !line.includes(" -> ") || line.includes('arrowhead="onormal"'),
+    (line: string) =>
+      !line.includes(" -> ") || line.includes('arrowhead="onormal"'),
   )
-  .map((line) =>
+  .map((line: string) =>
     line.includes(".interface.ts")
       ? line.replace('fillcolor="#ddfeff"', 'fillcolor="#ccffcc"')
       : line,
