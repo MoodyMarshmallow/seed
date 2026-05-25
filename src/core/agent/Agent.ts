@@ -4,11 +4,11 @@ import type {
 } from "../memory/AgentMemory.interface";
 import type { ModelClient } from "../model/ModelClient.interface";
 import type { ToolCallRequest } from "../tools/Tool.interface";
-import type { ToolRegistry } from "../tools/ToolRegistry";
+import type { ToolRuntime } from "../tools/ToolRuntime.interface";
 import type { AgentTurnEvent } from "./events";
 
 /**
- * Runtime seams required by the Agent orchestrator.
+ * Runtime dependencies required by the Agent orchestrator.
  * Callers must provide dependencies for the same Agent runtime: Memory for the
  * target Conversations, a model client that accepts core model requests, and a
  * tool registry containing the tools exposed to that model client.
@@ -16,7 +16,7 @@ import type { AgentTurnEvent } from "./events";
 export interface AgentDependencies {
   readonly memory: AgentMemory;
   readonly model: ModelClient;
-  readonly tools: ToolRegistry;
+  readonly tools: ToolRuntime;
 }
 
 /**
@@ -30,6 +30,7 @@ export interface RunTurnInput {
 }
 
 interface AssistantPassCollector {
+  // TODO: rename this
   readonly toolCalls: ToolCallRequest[];
 }
 
@@ -37,7 +38,7 @@ interface AssistantPassCollector {
 export class Agent {
   readonly #memory: AgentMemory;
   readonly #model: ModelClient;
-  readonly #tools: ToolRegistry;
+  readonly #tools: ToolRuntime;
 
   constructor(dependencies: AgentDependencies) {
     this.#memory = dependencies.memory;

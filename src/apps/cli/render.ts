@@ -1,10 +1,10 @@
-import type { AgentTurnEvent } from "../../core/agent/events";
+import type { CliTurnEvent } from "../../runtime/CliRuntime.interface";
 
 export class CliTurnRenderer {
   #inlineBlock: "reasoning" | "text" | null = null;
 
   /** Renders streaming text inline while keeping metadata events readable. */
-  render(event: AgentTurnEvent): string {
+  render(event: CliTurnEvent): string {
     switch (event.type) {
       case "reasoning_summary.delta":
         return this.#renderInlineDelta("reasoning", event.delta);

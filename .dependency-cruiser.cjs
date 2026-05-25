@@ -4,7 +4,9 @@ module.exports = {
       name: "adapters-use-core-interfaces-only",
       severity: "error",
       from: { path: "^src/adapters" },
-      to: { path: "^src/core/(?!.*\\.interface\\.ts$)" },
+      to: {
+        path: "^src/core/(?!.*\\.interface\\.ts$)(?!.*\\.schema\\.ts$)(?!errors/AgentError\\.ts$)",
+      },
     },
     {
       name: "apps-use-public-runtime-only",

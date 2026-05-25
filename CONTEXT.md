@@ -6,6 +6,8 @@
 
 - **Agent**: The core orchestrator that runs turns through injected interfaces.
 - **Interface**: A stable replaceable contract, such as memory, token storage, model client, or tool execution.
+- **Schema module**: A public runtime validation boundary, named `*.schema.ts`, that exports schemas, codecs, or schema constants used to validate external data before it enters core types.
+- **Runtime error module**: A public runtime error boundary, such as `AgentError.ts`, that exports error values callers construct or catch at runtime.
 - **Adapter**: A concrete implementation of an interface shipped for local template use.
 - **Feature module**: Runtime behavior or orchestration code, such as the Agent, ConversationManager, config loader, or CLI harness.
 - **Conversation**: A user-facing chat history that can be resumed, displayed, and extended.
@@ -29,3 +31,5 @@ Resumed Conversation sync policy belongs in Conversation lifecycle core modules,
 Every path that makes an existing Conversation active should share one Conversation activation flow so current system prompt and Settings are applied consistently.
 
 Core should treat the tool catalog as structured Agent defaults. Model client adapters remain responsible for serializing tools through each provider's dedicated tool protocol rather than treating tools as ordinary prompt text.
+
+Use `*.interface.ts` only for type-only seams. Public runtime validation belongs in `*.schema.ts`, and public runtime error values should use explicit runtime names such as `AgentError.ts` rather than the broader term "contract".

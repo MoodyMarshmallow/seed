@@ -1,4 +1,7 @@
-import type { ConversationRecord, ConversationSummary } from "./entries";
+import type {
+  ConversationRecord,
+  ConversationSummary,
+} from "./ConversationRecord.interface";
 
 /**
  * Stores complete conversation records.

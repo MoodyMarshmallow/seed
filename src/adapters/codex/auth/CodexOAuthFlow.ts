@@ -1,6 +1,11 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { type Server, createServer } from "node:http";
 
+import type {
+  OAuthFlow,
+  OAuthLogin,
+} from "../../../core/auth/OAuthFlow.interface";
+
 const OPENAI_AUTH_ISSUER = "https://auth.openai.com";
 const CODEX_CLIENT_ID = "app_EMoamEEZ73f0CkXaXp7hrann";
 
@@ -10,13 +15,8 @@ const CODEX_CLIENT_ID = "app_EMoamEEZ73f0CkXaXp7hrann";
  * resolve `waitForCode` once with the callback code, and make `cancel`
  * idempotently release any local listener resources.
  */
-export interface CodexOAuthLogin {
+export interface CodexOAuthLogin extends OAuthLogin {
   readonly loginId: string;
-  readonly authUrl: string;
-  readonly redirectUri: string;
-  readonly codeVerifier: string;
-  readonly waitForCode: () => Promise<string>;
-  readonly cancel: () => Promise<void>;
 }
 
 /**
@@ -31,7 +31,7 @@ export interface CodexOAuthFlowOptions {
 }
 
 /** Starts the local callback listener used by both browser and headless URL auth. */
-export class CodexOAuthFlow {
+export class CodexOAuthFlow implements OAuthFlow {
   readonly #callbackHost: string;
   readonly #callbackPort: number;
   readonly #loginTimeoutMs: number;

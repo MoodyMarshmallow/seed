@@ -1,8 +1,11 @@
-import type { ConversationManager } from "../../../core/conversations/ConversationManager";
 import type {
   ConversationMessage,
   MessageContentBlock,
-} from "../../../core/conversations/entries";
+} from "../../../core/conversations/ConversationRecord.interface";
+import type {
+  ConversationContextReader,
+  ConversationRecorder,
+} from "../../../core/conversations/ConversationRuntime.interface";
 import type {
   AgentMemory,
   AssistantContentBlock,
@@ -12,9 +15,9 @@ import type { ModelMessageInput } from "../../../core/model/ModelClient.interfac
 
 /** Simple placeholder AgentMemory backed by one linear conversation timeline. */
 export class SimpleLinearMemory implements AgentMemory {
-  readonly #conversations: ConversationManager;
+  readonly #conversations: ConversationContextReader & ConversationRecorder;
 
-  constructor(conversations: ConversationManager) {
+  constructor(conversations: ConversationContextReader & ConversationRecorder) {
     this.#conversations = conversations;
   }
 

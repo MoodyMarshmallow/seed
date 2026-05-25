@@ -1,15 +1,11 @@
 import { spawn } from "node:child_process";
 
-import type { CodexOAuthLogin } from "../../adapters/codex/auth/CodexOAuthFlow";
-import type { TokenStore } from "../../core/auth/TokenStore.interface";
+import type { OAuthFlow } from "../core/auth/OAuthFlow.interface";
+import type { TokenStore } from "../core/auth/TokenStore.interface";
 
-interface CliOAuthFlow {
-  readonly start: () => Promise<CodexOAuthLogin>;
-}
-
-interface EnsureCliAuthOptions {
+interface EnsureRuntimeAuthOptions {
   readonly tokenStore: TokenStore;
-  readonly oauthFlow: CliOAuthFlow;
+  readonly oauthFlow: OAuthFlow;
   readonly exchangeAuthorizationCode: (input: {
     readonly authorizationCode: string;
     readonly redirectUri: string;
@@ -20,9 +16,9 @@ interface EnsureCliAuthOptions {
   readonly openUrl?: (url: string) => Promise<void>;
 }
 
-/** Ensures the CLI has local Codex auth, starting OAuth when no token exists. */
-export async function ensureCliAuth(
-  options: EnsureCliAuthOptions,
+/** Ensures the runtime has local auth, starting OAuth when no token exists. */
+export async function ensureRuntimeAuth(
+  options: EnsureRuntimeAuthOptions,
 ): Promise<void> {
   const existing = await options.tokenStore.read();
   if (existing) {

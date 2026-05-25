@@ -25,6 +25,18 @@ Always use the `tdd` skill for code changes. Follow TDD best practices:
 - When exporting a new interface, add a docstring that explains what implementations should do and the invariants they must uphold.
 - Run `bun run lint`, `bun run typecheck`, `bun run test`, and `bun run knip` before considering work complete.
 
+## Testing Guidelines
+
+- Test behavior through public interfaces and real seams; avoid tests that depend on private functions, storage internals, or incidental implementation order.
+- Keep each test focused on one behavior. If a test needs many assertions, split it unless the assertions describe one observable flow.
+- Prefer short setup helpers when they remove noise, but keep the behavior under test visible in the test body.
+- Name tests as specifications of observable behavior, not implementation steps.
+- Cover failure cases at seams: invalid lifecycle transitions, missing records, provider failures, tool failures, malformed persisted data, and adapter boundary errors.
+- Use integration-style tests for core flows where practical, especially Agent, Memory, Conversation, model, and tool interactions.
+- Add regression tests before fixing bugs, and keep them focused on the bug's externally visible behavior.
+- Avoid over-mocking. Use small fakes at external seams when real adapters would make the test slow, flaky, or dependent on network/auth state.
+- Refactor tests after they pass: remove duplicated setup, split broad tests, and keep assertions specific enough to catch real regressions.
+
 ## Agent skills
 
 ### Issue tracker

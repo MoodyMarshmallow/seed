@@ -1,22 +1,8 @@
-import type { ReasoningSettings } from "../config/AgentConfigStore.interface";
-
-export const CONVERSATION_SCHEMA_VERSION = 1;
-
-/**
- * Model-facing Settings stored with a Conversation.
- * Callers must treat these values as the active controls for future model
- * requests; provider-specific `responseOverrides` should be preserved without
- * core interpreting unknown keys.
- */
-export interface ResponseSettings {
-  readonly model: string;
-  readonly reasoning?: ReasoningSettings | undefined;
-  readonly responseOverrides: Readonly<Record<string, unknown>>;
-}
+import type { ResponseSettings } from "../settings/ResponseSettings.interface";
 
 interface ConversationHeader {
   readonly type: "conversation";
-  readonly version: typeof CONVERSATION_SCHEMA_VERSION;
+  readonly version: 1;
   readonly id: string;
   readonly createdAt: string;
   readonly updatedAt: string;

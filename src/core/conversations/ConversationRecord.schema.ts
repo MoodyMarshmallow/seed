@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { CONVERSATION_SCHEMA_VERSION } from "./entries";
+export const CONVERSATION_SCHEMA_VERSION = 1;
 
 const responseSettingsSchema = z.object({
   model: z.string().min(1),
@@ -13,6 +13,11 @@ const responseSettingsSchema = z.object({
   responseOverrides: z.record(z.string(), z.unknown()),
 });
 
+/**
+ * Runtime validator for persisted Conversation headers.
+ * Callers must use this when reading external Conversation records before
+ * treating them as core Conversation data contracts.
+ */
 export const conversationHeaderSchema = z.object({
   type: z.literal("conversation"),
   version: z.literal(CONVERSATION_SCHEMA_VERSION),
@@ -25,6 +30,11 @@ export const conversationHeaderSchema = z.object({
   settings: responseSettingsSchema,
 });
 
+/**
+ * Runtime validator for persisted Conversation turns.
+ * Callers must validate external turn records before appending or replaying
+ * them through Conversation core interfaces.
+ */
 export const conversationTurnSchema = z.object({
   id: z.string().min(1),
   timestamp: z.string().min(1),

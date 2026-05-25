@@ -1,15 +1,22 @@
 import { randomUUID } from "node:crypto";
 
 import { AgentError } from "../errors/AgentError";
-import type { ConversationStore } from "./ConversationStore.interface";
+import type { ResponseSettings } from "../settings/ResponseSettings.interface";
 import type {
   ConversationContext,
   ConversationMessage,
   ConversationRecord,
   ConversationTurn,
-  ResponseSettings,
-} from "./entries";
-import { CONVERSATION_SCHEMA_VERSION } from "./entries";
+} from "./ConversationRecord.interface";
+import { CONVERSATION_SCHEMA_VERSION } from "./ConversationRecord.schema";
+import type {
+  ConversationContextReader,
+  ConversationLifecycle,
+  ConversationRecorder,
+  CreateConversationInput,
+  CreatedConversation,
+} from "./ConversationRuntime.interface";
+import type { ConversationStore } from "./ConversationStore.interface";
 import { createTurnId, nowIso } from "./ids";
 
 interface ConversationManagerDependencies {
@@ -17,23 +24,13 @@ interface ConversationManagerDependencies {
   readonly store: ConversationStore;
 }
 
-interface CreateConversationInput extends ResponseSettings {
-  readonly systemPrompt: string;
-}
-
-/**
- * Conversation identity returned after creation or activation.
- * Implementations must return an `id` that can be used with Conversation core
- * methods and a `filePath` that points to the concrete persisted record when a
- * file-backed store is used.
- */
-export interface CreatedConversation {
-  readonly id: string;
-  readonly filePath: string;
-}
-
 /** Manages linear conversations and builds replay context. */
-export class ConversationManager {
+export class ConversationManager
+  implements
+    ConversationLifecycle,
+    ConversationContextReader,
+    ConversationRecorder
+{
   readonly #cwd: string;
   readonly #store: ConversationStore;
 

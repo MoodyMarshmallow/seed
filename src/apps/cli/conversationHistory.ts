@@ -1,9 +1,11 @@
-import type { ConversationManager } from "../../core/conversations/ConversationManager";
-import type { ConversationMessage } from "../../core/conversations/entries";
+import type {
+  CliConversationMessage,
+  CliConversations,
+} from "../../runtime/CliRuntime.interface";
 
 /** Renders previous messages for a resumed conversation. */
 export async function renderConversationHistory(
-  conversations: Pick<ConversationManager, "buildContext">,
+  conversations: Pick<CliConversations, "buildContext">,
   conversationId: string,
 ): Promise<string> {
   const conversationContext = await conversations.buildContext(conversationId);
@@ -14,7 +16,7 @@ export async function renderConversationHistory(
   return `\nPrevious conversation:\n${conversationContext.messages.map(renderMessage).join("\n\n")}\n\n`;
 }
 
-function renderMessage(message: ConversationMessage): string {
+function renderMessage(message: CliConversationMessage): string {
   const label =
     message.role === "user"
       ? "You"
@@ -25,7 +27,9 @@ function renderMessage(message: ConversationMessage): string {
   return `${label}:\n${body}`;
 }
 
-function renderContentBlocks(content: ConversationMessage["content"]): string {
+function renderContentBlocks(
+  content: CliConversationMessage["content"],
+): string {
   const lines: string[] = [];
   let textBuffer = "";
 
@@ -54,7 +58,7 @@ function renderContentBlocks(content: ConversationMessage["content"]): string {
 }
 
 function renderContentBlock(
-  block: ConversationMessage["content"][number],
+  block: CliConversationMessage["content"][number],
 ): string {
   if (block.type === "reasoning_summary") {
     return `[reasoning] ${block.text ?? ""}`;

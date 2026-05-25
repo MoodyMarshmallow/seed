@@ -1,4 +1,4 @@
-import type { ResponseSettings } from "../conversations/entries";
+import type { ResponseSettings } from "../settings/ResponseSettings.interface";
 import type { ToolDefinition } from "../tools/Tool.interface";
 
 export type ModelMessageInput =

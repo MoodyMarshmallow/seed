@@ -1,16 +1,16 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import type { ConversationStore } from "../../core/conversations/ConversationStore.interface";
 import type {
   ConversationRecord,
   ConversationSummary,
   ConversationTurn,
-} from "../../core/conversations/entries";
+} from "../../core/conversations/ConversationRecord.interface";
 import {
   conversationHeaderSchema,
   conversationTurnSchema,
-} from "../../core/conversations/schema";
+} from "../../core/conversations/ConversationRecord.schema";
+import type { ConversationStore } from "../../core/conversations/ConversationStore.interface";
 import { AgentError } from "../../core/errors/AgentError";
 
 interface JsonlConversationStoreOptions {

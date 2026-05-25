@@ -1,11 +1,11 @@
-import { ensureCliAuth } from "../../../src/apps/cli/auth";
+import { ensureRuntimeAuth } from "../../../src/runtime/auth";
 
 test("CLI auth starts OAuth when no local token exists", async () => {
   let openedUrl: string | null = null;
   let exchangedAuthorizationCode: string | null = null;
   const output: string[] = [];
 
-  await ensureCliAuth({
+  await ensureRuntimeAuth({
     headless: false,
     output: (line) => output.push(line),
     tokenStore: {

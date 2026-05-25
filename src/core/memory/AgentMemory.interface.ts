@@ -1,5 +1,5 @@
-import type { ResponseSettings } from "../conversations/entries";
 import type { ModelMessageInput } from "../model/ModelClient.interface";
+import type { ResponseSettings } from "../settings/ResponseSettings.interface";
 import type { ToolCallRequest, ToolCallResult } from "../tools/Tool.interface";
 
 interface PreparedTurn {

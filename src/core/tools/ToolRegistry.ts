@@ -5,9 +5,10 @@ import type {
   ToolCallResult,
   ToolDefinition,
 } from "./Tool.interface";
+import type { ToolRuntime } from "./ToolRuntime.interface";
 
 /** Lists available tools and dispatches tool calls by name. */
-export class ToolRegistry {
+export class ToolRegistry implements ToolRuntime {
   readonly #tools: ReadonlyMap<string, Tool>;
 
   constructor(tools: readonly Tool[]) {

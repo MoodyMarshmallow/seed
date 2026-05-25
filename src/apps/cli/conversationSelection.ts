@@ -1,12 +1,12 @@
-import type { AgentConfig } from "../../core/config/AgentConfigStore.interface";
 import type {
-  ConversationManager,
-  CreatedConversation,
-} from "../../core/conversations/ConversationManager";
-import type { ConversationSummary } from "../../core/conversations/entries";
+  CliAgentConfig,
+  CliConversationSummary,
+  CliConversations,
+  CliCreatedConversation,
+} from "../../runtime/CliRuntime.interface";
 
 type ConversationSelectionManager = Pick<
-  ConversationManager,
+  CliConversations,
   "listConversations" | "createConversation" | "activateConversation"
 >;
 
@@ -21,7 +21,7 @@ export interface ConversationSelectionIo {
 }
 
 export function formatConversationChoices(
-  conversations: readonly ConversationSummary[],
+  conversations: readonly CliConversationSummary[],
 ): string {
   const lines = ["Choose a conversation:", "  1. New conversation"];
   conversations.forEach((conversation, index) => {
@@ -54,9 +54,9 @@ export function resolveConversationSelection(
 /** Presents saved conversations by number so users do not need to remember IDs. */
 export async function selectInitialConversation(dependencies: {
   readonly conversations: ConversationSelectionManager;
-  readonly config: AgentConfig;
+  readonly config: CliAgentConfig;
   readonly io: ConversationSelectionIo;
-}): Promise<CreatedConversation> {
+}): Promise<CliCreatedConversation> {
   const existing = await dependencies.conversations.listConversations();
   if (existing.length === 0) {
     dependencies.io.write(
@@ -95,6 +95,6 @@ export async function selectInitialConversation(dependencies: {
   }
 }
 
-function formatConversationLabel(conversation: ConversationSummary): string {
+function formatConversationLabel(conversation: CliConversationSummary): string {
   return `${new Date(conversation.timestamp).toLocaleString()} (${conversation.id.slice(0, 8)})`;
 }

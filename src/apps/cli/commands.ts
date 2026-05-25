@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { ResponseSettings } from "../../core/conversations/entries";
+import type { CliResponseSettings } from "../../runtime/CliRuntime.interface";
 
 const jsonObjectSchema = z.record(z.string(), z.unknown());
 
@@ -25,9 +25,9 @@ Chat commands:
 
 /** Applies CLI-only settings commands to the current conversation settings. */
 export function applyCliSettingsCommand(
-  settings: ResponseSettings,
+  settings: CliResponseSettings,
   command: string,
-): ResponseSettings {
+): CliResponseSettings {
   const trimmed = command.trim();
   if (trimmed.startsWith("/model ")) {
     return { ...settings, model: trimmed.slice("/model ".length).trim() };

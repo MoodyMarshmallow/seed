@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
+import { composeCliRuntime } from "../../runtime/composeCliRuntime";
 import { applyCliSettingsCommand, helpText } from "./commands";
-import { composeCliAgent } from "./compose";
 import { renderConversationHistory } from "./conversationHistory";
 import { selectInitialConversation } from "./conversationSelection";
 import { createCliReadline } from "./readline";
@@ -14,9 +14,10 @@ async function main(): Promise<void> {
   }
 
   const cwd = process.env.SEED_CWD ?? process.cwd();
-  const { config, conversations, memory, agent } = await composeCliAgent(cwd, {
-    headlessAuth: cliArgs.includes("--headless-auth"),
-  });
+  const { config, conversations, agent, updateConversationSettings } =
+    await composeCliRuntime(cwd, {
+      headlessAuth: cliArgs.includes("--headless-auth"),
+    });
   const readline = createCliReadline();
   let conversation = cliArgs.includes("--resume")
     ? await conversations.resumeMostRecentOrCreate(config)
@@ -59,13 +60,9 @@ async function main(): Promise<void> {
         userInput.startsWith("/reasoning ") ||
         userInput.startsWith("/set-json ")
       ) {
-        const preparedTurn = await memory.prepareTurn({
+        await updateConversationSettings({
           conversationId: conversation.id,
-        });
-        await memory.record({
-          type: "settings_changed",
-          conversationId: conversation.id,
-          settings: applyCliSettingsCommand(preparedTurn.settings, userInput),
+          update: (settings) => applyCliSettingsCommand(settings, userInput),
         });
         process.stdout.write("Settings updated.\n");
         continue;

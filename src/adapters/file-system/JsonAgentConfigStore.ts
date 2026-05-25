@@ -2,9 +2,9 @@ import { readFile } from "node:fs/promises";
 
 import {
   type AgentConfig,
-  type AgentConfigStore,
   agentConfigSchema,
-} from "../../core/config/AgentConfigStore.interface";
+} from "../../core/config/AgentConfig.schema";
+import type { AgentConfigStore } from "../../core/config/AgentConfigStore.interface";
 import { AgentError } from "../../core/errors/AgentError";
 
 interface JsonAgentConfigStoreOptions {
